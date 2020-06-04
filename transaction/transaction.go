@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"gotc/rand"
+	"gotc/utils"
 	"strconv"
 )
 
@@ -16,8 +16,8 @@ type Transaction struct {
 }
 
 func NewTransaction(value uint64) *Transaction {
-	sender := sha256.Sum256(rand.RandomBytes())
-	receiver := sha256.Sum256(rand.RandomBytes())
+	sender := sha256.Sum256(utils.RandomBytes())
+	receiver := sha256.Sum256(utils.RandomBytes())
 
 	hash := sha256.Sum256(toBytes(sender, receiver, value))
 
