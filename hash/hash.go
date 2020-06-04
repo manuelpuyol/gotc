@@ -2,7 +2,7 @@ package hash
 
 import (
 	"crypto/sha256"
-	"fmt"
+	"gotc/utils"
 	"strings"
 )
 
@@ -18,13 +18,13 @@ func NewHash(difficulty int) *Hash {
 }
 
 func (h *Hash) IsValid(test string) bool {
-	val := fmt.Sprintf("%x", sha256.Sum256([]byte(test)))
+	val := utils.SHAToString(sha256.Sum256([]byte(test)))
 	cmp := val[0:h.difficulty]
 
 	return cmp == h.challenge
 }
 
 func BTCHash(data []byte) [sha256.Size]byte {
-	hash := fmt.Sprintf("%x", sha256.Sum256(data))
+	hash := utils.SHAToString(sha256.Sum256(data))
 	return sha256.Sum256([]byte(hash))
 }

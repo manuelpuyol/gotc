@@ -27,9 +27,9 @@ func NewTransaction(value uint64) *Transaction {
 func (t *Transaction) ToJSON() map[string]interface{} {
 	return map[string]interface{}{
 		"value":    t.Value,
-		"sender":   fmt.Sprintf("%x", t.Sender),
-		"receiver": fmt.Sprintf("%x", t.Receiver),
-		"hash":     fmt.Sprintf("%x", t.Hash),
+		"sender":   utils.SHAToString(t.Sender),
+		"receiver": utils.SHAToString(t.Receiver),
+		"hash":     utils.SHAToString(t.Hash),
 	}
 }
 
@@ -39,8 +39,8 @@ func (t *Transaction) Print() {
 }
 
 func toBytes(sender, receiver [sha256.Size]byte, value uint64) []byte {
-	sstr := fmt.Sprintf("%x", sender)
-	rstr := fmt.Sprintf("%x", receiver)
+	sstr := utils.SHAToString(sender)
+	rstr := utils.SHAToString(receiver)
 	vstr := strconv.FormatUint(value, 10)
 
 	str := sstr + rstr + vstr

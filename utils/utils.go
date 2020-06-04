@@ -1,10 +1,18 @@
 package utils
 
-import "math/rand"
+import (
+	"crypto/sha256"
+	"fmt"
+	"math/rand"
+)
 
 const ASCIIStart = 65
 const ASCIIEnd = 90
 const Length = 10
+
+func SHAToString(bytes [sha256.Size]byte) string {
+	return fmt.Sprintf("%x", bytes)
+}
 
 func RandomBytes() []byte {
 	bytes := make([]byte, Length)

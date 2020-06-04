@@ -8,6 +8,7 @@ import (
 	"gotc/hash"
 	"gotc/merkle"
 	"gotc/transaction"
+	"gotc/utils"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -39,7 +40,7 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 
 	return &CPUMiner{
 		transactions,
-		fmt.Sprintf("%x", bc.LastHash()),
+		utils.SHAToString(bc.LastHash()),
 		bc.Difficulty,
 		threads,
 		NotFound,
@@ -53,7 +54,7 @@ func (m *CPUMiner) Mine() *block.Block {
 	m.group.Add(m.threads)
 
 	mt := merkle.NewTree(m.transactions)
-	root := fmt.Sprintf("%x", mt.GetRoot())
+	root := utils.SHAToString(mt.GetRoot())
 	prefix := m.prev + root
 
 	var id uint64

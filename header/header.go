@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"gotc/utils"
 	"strconv"
 )
 
@@ -23,9 +24,9 @@ func NewHeader(nonce uint64, prev, root [sha256.Size]byte) *Header {
 func (h *Header) ToJSON() map[string]interface{} {
 	return map[string]interface{}{
 		"nonce": h.Nonce,
-		"prev":  fmt.Sprintf("%x", h.Prev),
-		"root":  fmt.Sprintf("%x", h.Root),
-		"hash":  fmt.Sprintf("%x", h.Hash),
+		"prev":  utils.SHAToString(h.Prev),
+		"root":  utils.SHAToString(h.Root),
+		"hash":  utils.SHAToString(h.Hash),
 	}
 }
 
@@ -35,8 +36,8 @@ func (h *Header) Print() {
 }
 
 func toBytes(prev, root [sha256.Size]byte, nonce uint64) []byte {
-	pstr := fmt.Sprintf("%x", prev)
-	rstr := fmt.Sprintf("%x", root)
+	pstr := utils.SHAToString(prev)
+	rstr := utils.SHAToString(root)
 	nstr := strconv.FormatUint(nonce, 10)
 
 	str := pstr + rstr + nstr

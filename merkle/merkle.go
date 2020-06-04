@@ -2,8 +2,8 @@ package merkle
 
 import (
 	"crypto/sha256"
-	"fmt"
 	"gotc/transaction"
+	"gotc/utils"
 )
 
 type Tree struct {
@@ -37,10 +37,10 @@ func calculateNextLevel(nodes [][sha256.Size]byte) [][sha256.Size]byte {
 	size := len(nodes)
 
 	for i := 0; i < size; i += 2 {
-		val := fmt.Sprintf("%x", nodes[i])
+		val := utils.SHAToString(nodes[i])
 
 		if i+i < size {
-			val += fmt.Sprintf("%x", nodes[i+1])
+			val += utils.SHAToString(nodes[i+1])
 		}
 
 		parents = append(parents, sha256.Sum256([]byte(val)))
