@@ -2,9 +2,10 @@ package main
 
 import (
 	"crypto/sha256"
+	"fmt"
 	"gotc/block"
-	"gotc/blockchain"
 	"gotc/header"
+	"gotc/merkle"
 	"gotc/transaction"
 )
 
@@ -23,12 +24,15 @@ func main() {
 	b := block.NewBlock(h, ts)
 	b.Print()
 
-	bc := blockchain.NewBlockchain(2)
-	bc.AddBlock(b)
+	// bc := blockchain.NewBlockchain(2)
+	// bc.AddBlock(b)
 
-	h2 := header.NewHeader(2, h.Hash, root)
-	b2 := block.NewBlock(h2, ts)
+	// h2 := header.NewHeader(2, h.Hash, root)
+	// b2 := block.NewBlock(h2, ts)
 
-	bc.AddBlock(b2)
-	bc.Print()
+	// bc.AddBlock(b2)
+	// bc.Print()
+
+	mt := merkle.NewTree(ts)
+	fmt.Printf("%x", mt.GetRoot())
 }
