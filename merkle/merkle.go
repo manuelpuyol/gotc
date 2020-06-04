@@ -7,8 +7,7 @@ import (
 )
 
 type Tree struct {
-	leaves      [][sha256.Size]byte
-	permutation int
+	leaves [][sha256.Size]byte
 }
 
 func NewTree(transactions []*transaction.Transaction) *Tree {
@@ -18,7 +17,7 @@ func NewTree(transactions []*transaction.Transaction) *Tree {
 		leaves = append(leaves, t.Hash)
 	}
 
-	return &Tree{leaves, 0}
+	return &Tree{leaves}
 }
 
 func (mt *Tree) GetRoot() [sha256.Size]byte {
