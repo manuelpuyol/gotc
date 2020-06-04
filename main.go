@@ -30,7 +30,7 @@ func main() {
 	b := block.NewBlock(h, ts)
 	b.Print()
 
-	bc := blockchain.NewBlockchain(2)
+	bc := blockchain.NewBlockchain(3)
 	bc.AddBlock(b)
 
 	h2 := header.NewHeader(2, h.Hash, root)

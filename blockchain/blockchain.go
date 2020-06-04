@@ -9,14 +9,14 @@ import (
 )
 
 type Blockchain struct {
-	Difficulty uint
+	Difficulty int
 	Head       *block.Block
 	Tail       *block.Block
 	NBlocks    uint
 	mutex      *sync.Mutex
 }
 
-func NewBlockchain(difficulty uint) *Blockchain {
+func NewBlockchain(difficulty int) *Blockchain {
 	var mutex sync.Mutex
 	return &Blockchain{difficulty, nil, nil, 0, &mutex}
 }

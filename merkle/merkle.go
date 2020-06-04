@@ -24,8 +24,6 @@ func (mt *Tree) GetRoot() [sha256.Size]byte {
 	parents := make([][sha256.Size]byte, len(mt.leaves))
 	copy(parents, mt.leaves)
 
-	fmt.Println("parents len = ", len(parents))
-	fmt.Println("leaves len = ", len(mt.leaves))
 	for len(parents) > 1 {
 		parents = calculateNextLevel(parents)
 	}
