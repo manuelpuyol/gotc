@@ -22,13 +22,7 @@ func NewBlockchain(difficulty uint) *Blockchain {
 }
 
 func (bc *Blockchain) AddBlock(b *block.Block) bool {
-	var lastHash [sha256.Size]byte
-
-	if bc.Head != nil {
-		lastHash = bc.Tail.Header.Hash
-	}
-
-	if b.Header.Prev != lastHash {
+	if b.Header.Prev != bc.LastHash() {
 		return false
 	}
 
@@ -44,6 +38,16 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	bc.mutex.Unlock()
 
 	return true
+}
+
+func (bc *Blockchain) LastHash() [sha256.Size]byte {
+	var lastHash [sha256.Size]byte
+
+	if bc.Head != nil {
+		lastHash = bc.Tail.Header.Hash
+	}
+
+	return lastHash
 }
 
 func (bc *Blockchain) ToJSON() map[string]interface{} {
