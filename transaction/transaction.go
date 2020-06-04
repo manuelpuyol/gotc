@@ -6,20 +6,22 @@ import (
 )
 
 type Transaction struct {
-	value    uint
-	sender   [sha256.Size]byte
-	receiver [sha256.Size]byte
-	hash     [sha256.Size]byte
+	Value    uint              `json:"value"`
+	Sender   [sha256.Size]byte `json:"sender"`
+	Receiver [sha256.Size]byte `json:"receiver"`
+	Hash     [sha256.Size]byte `json:"hash"`
 }
 
 func NewTransaction(value uint) *Transaction {
 	sender := sha256.Sum256(rand.RandomBytes())
 	receiver := sha256.Sum256(rand.RandomBytes())
 
-	bytes := append(receiver[:], sender[:]...)
-	bytes = append(bytes, byte(value))
-
-	hash := sha256.Sum256(bytes)
+	hash := sha256.Sum256(toBytes(sender, receiver, value))
 
 	return &Transaction{value, sender, receiver, hash}
+}
+
+func toBytes(sender, receiver [sha256.Size]byte, value uint) []byte {
+	bytes := append(receiver[:], sender[:]...)
+	return append(bytes, byte(value))
 }
