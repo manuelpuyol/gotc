@@ -4,16 +4,17 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 type Header struct {
-	Nonce uint
+	Nonce uint64
 	Prev  [sha256.Size]byte
 	Root  [sha256.Size]byte
 	Hash  [sha256.Size]byte
 }
 
-func NewHeader(nonce uint, prev, root [sha256.Size]byte) *Header {
+func NewHeader(nonce uint64, prev, root [sha256.Size]byte) *Header {
 	hash := sha256.Sum256(toBytes(prev, root, nonce))
 
 	return &Header{nonce, prev, root, hash}
@@ -33,7 +34,11 @@ func (h *Header) Print() {
 	fmt.Println(string(j))
 }
 
-func toBytes(prev, root [sha256.Size]byte, nonce uint) []byte {
-	bytes := append(prev[:], root[:]...)
-	return append(bytes, byte(nonce))
+func toBytes(prev, root [sha256.Size]byte, nonce uint64) []byte {
+	pstr := fmt.Sprintf("%x", prev)
+	rstr := fmt.Sprintf("%x", root)
+	nstr := strconv.FormatUint(nonce, 10)
+
+	str := pstr + rstr + nstr
+	return []byte(str)
 }

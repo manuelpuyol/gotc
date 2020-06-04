@@ -40,12 +40,13 @@ func calculateNextLevel(nodes [][sha256.Size]byte) [][sha256.Size]byte {
 	size := len(nodes)
 
 	for i := 0; i < size; i += 2 {
-		val := nodes[i][:]
+		val := fmt.Sprintf("%x", nodes[i])
+
 		if i+i < size {
-			val = append(val, nodes[i+1][:]...)
+			val += fmt.Sprintf("%x", nodes[i+1])
 		}
 
-		parents = append(parents, sha256.Sum256(val))
+		parents = append(parents, sha256.Sum256([]byte(val)))
 	}
 
 	return parents

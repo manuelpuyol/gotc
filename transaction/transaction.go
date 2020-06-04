@@ -5,16 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"gotc/rand"
+	"strconv"
 )
 
 type Transaction struct {
-	Value    uint
+	Value    uint64
 	Sender   [sha256.Size]byte
 	Receiver [sha256.Size]byte
 	Hash     [sha256.Size]byte
 }
 
-func NewTransaction(value uint) *Transaction {
+func NewTransaction(value uint64) *Transaction {
 	sender := sha256.Sum256(rand.RandomBytes())
 	receiver := sha256.Sum256(rand.RandomBytes())
 
@@ -37,7 +38,11 @@ func (t *Transaction) Print() {
 	fmt.Println(string(j))
 }
 
-func toBytes(sender, receiver [sha256.Size]byte, value uint) []byte {
-	bytes := append(receiver[:], sender[:]...)
-	return append(bytes, byte(value))
+func toBytes(sender, receiver [sha256.Size]byte, value uint64) []byte {
+	sstr := fmt.Sprintf("%x", sender)
+	rstr := fmt.Sprintf("%x", receiver)
+	vstr := strconv.FormatUint(value, 10)
+
+	str := sstr + rstr + vstr
+	return []byte(str)
 }
