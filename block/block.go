@@ -9,6 +9,7 @@ type Block struct {
 	Header        *header.Header             `json:"header"`
 	Transactions  []*transaction.Transaction `json:"transactions"`
 	NTransactions uint                       `json:"ntransactions"`
+	Next          *Block
 }
 
 func NewBlock(h *header.Header, transactions []*transaction.Transaction) *Block {
