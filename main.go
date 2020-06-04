@@ -12,7 +12,7 @@ func main() {
 	t := transaction.NewTransaction(10)
 	t.Print()
 
-	prev := sha256.Sum256([]byte("prev"))
+	var prev [sha256.Size]byte
 	root := sha256.Sum256([]byte("root"))
 	h := header.NewHeader(1, prev, root)
 	h.Print()
@@ -24,8 +24,11 @@ func main() {
 	b.Print()
 
 	bc := blockchain.NewBlockchain(2)
-	bc.AddBlock(ts, 1, root)
-	bc.AddBlock(ts, 2, root)
-	bc.AddBlock(ts, 3, root)
+	bc.AddBlock(b)
+
+	h2 := header.NewHeader(2, h.Hash, root)
+	b2 := block.NewBlock(h2, ts)
+
+	bc.AddBlock(b2)
 	bc.Print()
 }

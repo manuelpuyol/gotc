@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"gotc/block"
-	"gotc/header"
-	"gotc/transaction"
 )
 
 type Blockchain struct {
@@ -20,15 +18,16 @@ func NewBlockchain(difficulty uint) *Blockchain {
 	return &Blockchain{difficulty, nil, nil, 0}
 }
 
-func (bc *Blockchain) AddBlock(transactions []*transaction.Transaction, nonce uint, root [sha256.Size]byte) bool {
+func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	var lastHash [sha256.Size]byte
 
 	if bc.Head != nil {
 		lastHash = bc.Tail.Header.Hash
 	}
 
-	h := header.NewHeader(nonce, lastHash, root)
-	b := block.NewBlock(h, transactions)
+	if b.Header.Prev != lastHash {
+		return false
+	}
 
 	if bc.Head == nil {
 		bc.Head = b
