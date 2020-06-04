@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gotc/block"
+	"sync"
 )
 
 type Blockchain struct {
@@ -12,10 +13,12 @@ type Blockchain struct {
 	Head       *block.Block
 	Tail       *block.Block
 	NBlocks    uint
+	mutex      *sync.Mutex
 }
 
 func NewBlockchain(difficulty uint) *Blockchain {
-	return &Blockchain{difficulty, nil, nil, 0}
+	var mutex sync.Mutex
+	return &Blockchain{difficulty, nil, nil, 0, &mutex}
 }
 
 func (bc *Blockchain) AddBlock(b *block.Block) bool {
@@ -29,6 +32,7 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 		return false
 	}
 
+	bc.mutex.Lock()
 	if bc.Head == nil {
 		bc.Head = b
 	}
@@ -37,6 +41,7 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	}
 	bc.Tail = b
 	bc.NBlocks++
+	bc.mutex.Unlock()
 
 	return true
 }
