@@ -7,6 +7,7 @@ import (
 	"gotc/blockchain"
 	"gotc/header"
 	"gotc/merkle"
+	"gotc/miner"
 	"gotc/transaction"
 )
 
@@ -38,4 +39,6 @@ func main() {
 	bc.AddBlock(b2)
 	bc.Print()
 
+	m := miner.NewCPUMiner(ts, bc, 4)
+	m.Mine()
 }
