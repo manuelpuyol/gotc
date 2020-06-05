@@ -91,9 +91,8 @@ func (m *CPUMiner) Mine() bool {
 func (m *CPUMiner) sendBlock() bool {
 	mt := merkle.NewTree(m.transactions)
 	h := blockchain.NewHeader(m.nonce, m.prev, mt.GetRoot())
-	b := blockchain.NewBlock(h, m.transactions)
 
-	return m.bc.AddBlock(b)
+	return m.bc.AddBlock(blockchain.NewBlock(h, m.transactions))
 }
 
 func (m *CPUMiner) checkPermutation() {
