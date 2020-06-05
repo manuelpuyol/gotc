@@ -1,17 +1,16 @@
 package merkle
 
 import (
-	"crypto/sha256"
+	"gotc/hash"
 	"gotc/transaction"
-	"gotc/utils"
 )
 
 type Tree struct {
-	leaves [][sha256.Size]byte
+	leaves []string
 }
 
 func NewTree(transactions []*transaction.Transaction) *Tree {
-	var leaves [][sha256.Size]byte
+	var leaves []string
 
 	for _, t := range transactions {
 		leaves = append(leaves, t.Hash)
@@ -20,8 +19,8 @@ func NewTree(transactions []*transaction.Transaction) *Tree {
 	return &Tree{leaves}
 }
 
-func (mt *Tree) GetRoot() [sha256.Size]byte {
-	parents := make([][sha256.Size]byte, len(mt.leaves))
+func (mt *Tree) GetRoot() string {
+	parents := make([]string, len(mt.leaves))
 	copy(parents, mt.leaves)
 
 	for len(parents) > 1 {
@@ -31,19 +30,19 @@ func (mt *Tree) GetRoot() [sha256.Size]byte {
 	return parents[0]
 }
 
-func calculateNextLevel(nodes [][sha256.Size]byte) [][sha256.Size]byte {
-	var parents [][sha256.Size]byte
+func calculateNextLevel(nodes []string) []string {
+	var parents []string
 
 	size := len(nodes)
 
 	for i := 0; i < size; i += 2 {
-		val := utils.SHAToString(nodes[i])
+		val := nodes[i]
 
 		if i+i < size {
-			val += utils.SHAToString(nodes[i+1])
+			val += nodes[i+1]
 		}
 
-		parents = append(parents, sha256.Sum256([]byte(val)))
+		parents = append(parents, hash.StrHash(val))
 	}
 
 	return parents

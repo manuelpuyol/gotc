@@ -1,7 +1,6 @@
 package miner
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"gotc/block"
 	"gotc/blockchain"
@@ -9,7 +8,6 @@ import (
 	"gotc/header"
 	"gotc/merkle"
 	"gotc/transaction"
-	"gotc/utils"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -29,7 +27,6 @@ type Miner interface {
 type CPUMiner struct {
 	transactions []*transaction.Transaction
 	prev         string
-	prevHash     [sha256.Size]byte
 	difficulty   int
 	threads      int
 	found        int32
@@ -41,12 +38,10 @@ type CPUMiner struct {
 func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockchain, threads int) Miner {
 	var mutex sync.Mutex
 	var group sync.WaitGroup
-	prev := bc.LastHash()
 
 	return &CPUMiner{
 		transactions,
-		utils.SHAToString(prev),
-		prev,
+		bc.LastHash(),
 		bc.Difficulty,
 		threads,
 		NotFound,
@@ -65,7 +60,7 @@ func (m *CPUMiner) Mine() *block.Block {
 
 	if m.found == Found {
 		mt := merkle.NewTree(m.transactions)
-		h := header.NewHeader(m.nonce, m.prevHash, mt.GetRoot())
+		h := header.NewHeader(m.nonce, m.prev, mt.GetRoot())
 		return block.NewBlock(h, m.transactions)
 	}
 
@@ -76,7 +71,7 @@ func (m *CPUMiner) checkPermutation() {
 	m.group.Add(m.threads)
 
 	mt := merkle.NewTree(m.transactions)
-	root := utils.SHAToString(mt.GetRoot())
+	root := mt.GetRoot()
 	prefix := m.prev + root
 
 	var id uint64
@@ -107,7 +102,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 			if atomic.CompareAndSwapInt32(&m.found, NotFound, Found) {
 				fmt.Println("\nThread ", id, " found a block")
 				fmt.Println("Nonce = ", nonce)
-				fmt.Printf("Hash = %x\n", sha256.Sum256([]byte(test)))
+				fmt.Println("Hash = ", hash.BTCHash(test))
 				m.nonce = nonce
 			}
 		}

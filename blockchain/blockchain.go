@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gotc/block"
+	"strings"
 	"sync"
 )
 
@@ -41,14 +42,11 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	return true
 }
 
-func (bc *Blockchain) LastHash() [sha256.Size]byte {
-	var lastHash [sha256.Size]byte
-
+func (bc *Blockchain) LastHash() string {
 	if bc.Head != nil {
-		lastHash = bc.Tail.Header.Hash
+		return bc.Tail.Header.Hash
 	}
-
-	return lastHash
+	return strings.Repeat("0", sha256.BlockSize)
 }
 
 func (bc *Blockchain) ToJSON() map[string]interface{} {
