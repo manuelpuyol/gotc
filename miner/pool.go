@@ -4,12 +4,30 @@ import (
 	"bufio"
 	"encoding/json"
 	"gotc/blockchain"
+	"gotc/constants"
 	"gotc/queue"
+	gsync "gotc/sync"
 	"gotc/utils"
 	"math/rand"
 	"os"
 	"sync"
 )
+
+type PoolCTX struct {
+	missed               []*blockchain.Transaction
+	transactionsPerBlock int
+	shuffles             int
+}
+
+func newPoolCTX() *PoolCTX {
+	var missed []*blockchain.Transaction
+
+	return &PoolCTX{
+		missed:               missed,
+		transactionsPerBlock: constants.MaxTransactionsPerBlock,
+		shuffles:             0,
+	}
+}
 
 type Pool struct {
 	size    int
@@ -18,7 +36,7 @@ type Pool struct {
 	miners  []Miner
 	bc      *blockchain.Blockchain
 	ctx     *PoolCTX
-	barrier *BarrierCTX
+	barrier *gsync.Barrier
 	Queue   *queue.Queue
 }
 
@@ -38,7 +56,7 @@ func NewPool(size, threads int, inPath, outPath string, bc *blockchain.Blockchai
 		miners:  miners,
 		bc:      bc,
 		ctx:     newPoolCTX(),
-		barrier: newBarrierCTX(threads),
+		barrier: gsync.NewBarrier(size),
 		Queue:   q,
 	}
 }
@@ -57,19 +75,14 @@ func (p *Pool) Prepare() {
 }
 
 func (p *Pool) Process() bool {
-	transactionsCount := p.Queue.Size
-
-	m := p.miners[0]
-
-	for p.ctx.processed < transactionsCount {
-		transactions := p.getTransactions()
-		m.Reset(transactions)
-
-		if !m.Mine() {
-			p.ctx.missed = append(p.ctx.missed, transactions...)
+	if len(p.miners) == 1 {
+		p.startMiner(0)
+	} else {
+		p.barrier.Start()
+		for i := range p.miners {
+			go p.startMiner(i)
 		}
-
-		p.ctx.processed += p.ctx.transactionsPerBlock
+		p.barrier.Wait()
 	}
 
 	if len(p.ctx.missed) > 0 {
@@ -89,6 +102,26 @@ func (p *Pool) Finish() {
 
 	_, err = file.Write(j)
 	utils.CheckErr(err)
+}
+
+func (p *Pool) startMiner(id int) {
+	m := p.miners[id]
+
+	for p.Queue.Size > 0 {
+		transactions := p.getTransactions()
+
+		if len(transactions) > 0 {
+			m.Reset(transactions)
+
+			if !m.Mine() {
+				p.ctx.missed = append(p.ctx.missed, transactions...)
+			}
+		}
+	}
+
+	if len(p.miners) > 1 {
+		p.barrier.Done()
+	}
 }
 
 func (p *Pool) getTransactions() []*blockchain.Transaction {
