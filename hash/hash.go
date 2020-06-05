@@ -18,13 +18,21 @@ func NewHash(difficulty int) *Hash {
 }
 
 func (h *Hash) IsValid(test string) bool {
-	val := utils.SHAToString(sha256.Sum256([]byte(test)))
+	val := BTCHash([]byte(test))
 	cmp := val[0:h.difficulty]
 
 	return cmp == h.challenge
 }
 
-func BTCHash(data []byte) [sha256.Size]byte {
+func BTCHash(data []byte) string {
 	hash := utils.SHAToString(sha256.Sum256(data))
-	return sha256.Sum256([]byte(hash))
+	return utils.SHAToString(sha256.Sum256([]byte(hash)))
+}
+
+func StrHash(data string) string {
+	return sha256.Sum256([]byte(data))
+}
+
+func ByteHash(data []byte) string {
+	return utils.SHAToString(sha256.Sum256([]byte(data)))
 }
