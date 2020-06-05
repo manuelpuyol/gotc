@@ -6,6 +6,7 @@ import (
 	"gotc/constants"
 	"gotc/hash"
 	"gotc/merkle"
+	"gotc/sync"
 	"strconv"
 	"sync/atomic"
 
@@ -24,7 +25,7 @@ type CPUMiner struct {
 	found        int32
 	nonce        uint64
 	id           int
-	barrier      *BarrierCTX
+	barrier      *sync.Barrier
 }
 
 func NewCPUMiner(bc *blockchain.Blockchain, threads, id int) Miner {
@@ -34,7 +35,7 @@ func NewCPUMiner(bc *blockchain.Blockchain, threads, id int) Miner {
 		found:   constants.NotFound,
 		nonce:   0,
 		id:      id,
-		barrier: newBarrierCTX(threads),
+		barrier: sync.NewBarrier(threads),
 	}
 }
 
@@ -44,7 +45,7 @@ func (m *CPUMiner) Reset(t []*blockchain.Transaction) {
 	m.found = constants.NotFound
 	m.nonce = 0
 
-	m.barrier.counter = 0
+	m.barrier.Reset()
 }
 
 func (m *CPUMiner) Mine() bool {
@@ -61,7 +62,7 @@ func (m *CPUMiner) Mine() bool {
 
 		// another miner beat me to it, so I have to mine again
 		m.Reset(m.transactions)
-		m.Mine()
+		return m.Mine()
 	}
 
 	return false
@@ -71,7 +72,16 @@ func (m *CPUMiner) sendBlock() bool {
 	mt := merkle.NewTree(m.transactions)
 	h := blockchain.NewHeader(m.nonce, m.prev, mt.GetRoot())
 
-	return m.bc.AddBlock(blockchain.NewBlock(h, m.transactions))
+	res := m.bc.AddBlock(blockchain.NewBlock(h, m.transactions))
+
+	if res {
+		fmt.Println("\nMiner", m.id, "found a block")
+		fmt.Println("Nonce = ", m.nonce)
+		fmt.Println("Hash = ", h.Hash)
+		fmt.Println("Prev = ", h.Prev)
+	}
+
+	return res
 }
 
 func (m *CPUMiner) checkPermutation() {
@@ -79,13 +89,13 @@ func (m *CPUMiner) checkPermutation() {
 	root := mt.GetRoot()
 	prefix := m.prev + root
 
-	if m.barrier.threads > 0 {
-		m.barrier.group.Add(m.barrier.threads)
+	if m.barrier.Threads > 0 {
+		m.barrier.Start()
 		var id uint64
-		for id = 0; id < uint64(m.barrier.threads); id++ {
+		for id = 0; id < uint64(m.barrier.Threads); id++ {
 			go findNonce(id, m, prefix)
 		}
-		m.barrier.group.Wait()
+		m.barrier.Wait()
 	} else {
 		findNonce(0, m, prefix)
 	}
@@ -94,14 +104,14 @@ func (m *CPUMiner) checkPermutation() {
 func findNonce(id uint64, m *CPUMiner, prefix string) {
 	bucket := constants.MaxUint64
 
-	if m.barrier.threads > 0 {
-		bucket /= uint64(m.barrier.threads)
+	if m.barrier.Threads > 0 {
+		bucket /= uint64(m.barrier.Threads)
 	}
 
 	nonce := id * bucket
 
 	var max uint64
-	if m.barrier.threads == 0 || id == uint64(m.barrier.threads-1) {
+	if m.barrier.Threads == 0 || id == uint64(m.barrier.Threads-1) {
 		max = constants.MaxUint64
 	} else {
 		max = (id + 1) * bucket
@@ -114,9 +124,6 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 
 		if h.IsValid(test) {
 			if atomic.CompareAndSwapInt32(&m.found, constants.NotFound, constants.Found) {
-				fmt.Println("\nMiner", m.id, "routine", id, "found a block")
-				fmt.Println("Nonce = ", nonce)
-				fmt.Println("Hash = ", hash.BTCHash(test))
 				m.nonce = nonce
 			}
 		}
@@ -124,20 +131,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 		nonce++
 	}
 
-	if m.barrier.threads > 0 {
-		// Barrier
-		m.barrier.mutex.Lock()
-		m.barrier.counter++
-		if m.barrier.counter == m.barrier.threads {
-			m.barrier.cond.Broadcast()
-		} else {
-			for m.barrier.counter != m.barrier.threads {
-				m.barrier.cond.Wait()
-			}
-		}
-		m.barrier.mutex.Unlock()
-
-		// Everyone finished
-		m.barrier.group.Done()
+	if m.barrier.Threads > 0 {
+		m.barrier.Done()
 	}
 }
