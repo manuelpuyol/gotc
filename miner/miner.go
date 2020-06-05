@@ -18,6 +18,7 @@ import (
 
 type Miner interface {
 	Mine() bool
+	Reset(t []*transaction.Transaction)
 }
 
 type CPUMiner struct {
@@ -31,19 +32,18 @@ type CPUMiner struct {
 	group        *sync.WaitGroup
 }
 
-func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockchain, threads int) Miner {
+func NewCPUMiner(bc *blockchain.Blockchain, threads int) Miner {
 	var mutex sync.Mutex
 	var group sync.WaitGroup
 
 	return &CPUMiner{
-		transactions,
-		bc,
-		bc.LastHash(),
-		threads,
-		constants.NotFound,
-		0,
-		&mutex,
-		&group,
+		bc:      bc,
+		prev:    bc.LastHash(),
+		threads: threads,
+		found:   constants.NotFound,
+		nonce:   0,
+		mutex:   &mutex,
+		group:   &group,
 	}
 }
 

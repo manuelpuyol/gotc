@@ -15,21 +15,24 @@ import (
 )
 
 type CTX struct {
+	m                    miner.Miner
 	transactions         []*transaction.Transaction
 	missed               []*transaction.Transaction
 	bc                   *blockchain.Blockchain
-	threads              int
 	transactionsPerBlock int
 	shuffles             int
 }
 
 func newCTX(difficulty, threads int, inPath string) *CTX {
 	var missed []*transaction.Transaction
+	bc := blockchain.NewBlockchain(difficulty)
+	m := miner.NewCPUMiner(bc, threads)
+
 	return &CTX{
+		m:                    m,
 		transactions:         readTransactions(inPath),
 		missed:               missed,
-		bc:                   blockchain.NewBlockchain(difficulty),
-		threads:              threads,
+		bc:                   bc,
 		transactionsPerBlock: constants.MaxTransactionsPerBlock,
 		shuffles:             0,
 	}
@@ -49,7 +52,11 @@ func main() {
 	minedAll := processTransactions(ctx)
 
 	if !minedAll {
-		fmt.Println("\nCould not find blocks for some transactions")
+		fmt.Println("\nCould not find blocks for the following transactions:")
+
+		for _, t := range ctx.transactions {
+			t.Print()
+		}
 	}
 
 	writeBlockchain(ctx.bc, *outPath)
@@ -61,10 +68,9 @@ func processTransactions(ctx *CTX) bool {
 
 	for processed < transactionsCount {
 		transactions := getTransactions(ctx, processed, transactionsCount)
+		ctx.m.Reset(transactions)
 
-		m := miner.NewCPUMiner(transactions, ctx.bc, ctx.threads)
-
-		if !m.Mine() {
+		if !ctx.m.Mine() {
 			ctx.missed = append(ctx.missed, transactions...)
 		}
 		processed += ctx.transactionsPerBlock
