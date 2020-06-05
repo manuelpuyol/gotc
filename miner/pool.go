@@ -46,7 +46,7 @@ func NewPool(size, threads int, inPath, outPath string, bc *blockchain.Blockchai
 
 	var miners []Miner
 	for i := 0; i < size; i++ {
-		miners = append(miners, NewCPUMiner(bc, threads))
+		miners = append(miners, NewCPUMiner(bc, threads, i))
 	}
 
 	return &Pool{

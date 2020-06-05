@@ -24,6 +24,7 @@ type CPUMiner struct {
 	prev         string
 	found        int32
 	nonce        uint64
+	id           int
 	ctx          *MinerCTX
 }
 
@@ -49,12 +50,13 @@ func newMinerCTX(threads int) *MinerCTX {
 	}
 }
 
-func NewCPUMiner(bc *blockchain.Blockchain, threads int) Miner {
+func NewCPUMiner(bc *blockchain.Blockchain, threads, id int) Miner {
 	return &CPUMiner{
 		bc:    bc,
 		prev:  bc.LastHash(),
 		found: constants.NotFound,
 		nonce: 0,
+		id:    id,
 		ctx:   newMinerCTX(threads),
 	}
 }
@@ -135,7 +137,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 
 		if h.IsValid(test) {
 			if atomic.CompareAndSwapInt32(&m.found, constants.NotFound, constants.Found) {
-				fmt.Println("\nGoroutine ", id, " found a block")
+				fmt.Println("\nMiner", m.id, "routine", id, "found a block")
 				fmt.Println("Nonce = ", nonce)
 				fmt.Println("Hash = ", hash.BTCHash(test))
 				m.nonce = nonce
