@@ -10,7 +10,6 @@ import (
 	"gotc/transaction"
 	"gotc/utils"
 	"os"
-	"time"
 )
 
 type CTX struct {
@@ -48,7 +47,7 @@ func processTransactions(ctx *CTX) {
 	processed := 0
 	transactionsCount := len(ctx.transactions)
 
-	go utils.Spinner(constants.SpinnerDelay * time.Millisecond)
+	go utils.Spinner("Mining...")
 
 	for processed < transactionsCount {
 		transactions := getTransactions(ctx, processed, transactionsCount)

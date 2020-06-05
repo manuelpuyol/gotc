@@ -25,11 +25,11 @@ func CheckErr(e error) {
 	}
 }
 
-func Spinner(delay time.Duration) {
+func Spinner(message string) {
 	for {
 		for _, r := range `⣽⣾⣷⣯⣟⡿⢿⣻` {
-			fmt.Printf("\r Mining... %c ", r)
-			time.Sleep(delay)
+			fmt.Printf("\r %s %c ", message, r)
+			time.Sleep(constants.SpinnerDelay * time.Millisecond)
 		}
 	}
 }
