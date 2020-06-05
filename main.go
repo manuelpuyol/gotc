@@ -22,9 +22,10 @@ type CTX struct {
 	transactionsPerBlock int
 	shuffles             int
 	processed            int
+	miners               int
 }
 
-func newCTX(difficulty, threads int, inPath string) *CTX {
+func newCTX(difficulty, threads, miners int, inPath string) *CTX {
 	var missed []*transaction.Transaction
 	bc := blockchain.NewBlockchain(difficulty)
 	m := miner.NewCPUMiner(bc, threads)
@@ -37,6 +38,7 @@ func newCTX(difficulty, threads int, inPath string) *CTX {
 		transactionsPerBlock: constants.MaxTransactionsPerBlock,
 		shuffles:             0,
 		processed:            0,
+		miners:               miners,
 	}
 }
 
@@ -44,10 +46,12 @@ func main() {
 	difficulty := flag.Int("d", 5, "The number of trailing 0s needed for a block to be valid")
 	inPath := flag.String("f", "data/transactions.txt", "Path to the file which contains the transactions to be read")
 	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain")
-	threads := flag.Int("p", 0, "The number of threads to run, defaults to 0 (serial implementation).")
+	miners := flag.Int("m", 1, "The number of miners to spawn")
+	threads := flag.Int("p", 0, "The number of threads for each miner to run, defaults to 0 (serial implementation).")
+
 	flag.Parse()
 
-	ctx := newCTX(*difficulty, *threads, *inPath)
+	ctx := newCTX(*difficulty, *threads, *miners, *inPath)
 
 	go utils.Spinner("Mining...")
 

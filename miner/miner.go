@@ -27,10 +27,10 @@ type CPUMiner struct {
 	prev         string
 	found        int32
 	nonce        uint64
-	ctx          *CTX
+	ctx          *MinerCTX
 }
 
-type CTX struct {
+type MinerCTX struct {
 	mutex   *sync.Mutex
 	cond    *sync.Cond
 	group   *sync.WaitGroup
@@ -38,12 +38,12 @@ type CTX struct {
 	threads int
 }
 
-func NewCTX(threads int) *CTX {
+func NewMinerCTX(threads int) *MinerCTX {
 	var mutex sync.Mutex
 	var group sync.WaitGroup
 	cond := sync.NewCond(&mutex)
 
-	return &CTX{
+	return &MinerCTX{
 		mutex:   &mutex,
 		group:   &group,
 		cond:    cond,
