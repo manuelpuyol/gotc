@@ -9,9 +9,12 @@ import (
 	"gotc/merkle"
 	"gotc/transaction"
 	"gotc/utils"
+	"sort"
 	"strconv"
 	"sync"
 	"sync/atomic"
+
+	"github.com/gitchander/permutation"
 )
 
 const Uint64Size = 64 << (^uint(0) >> 64 & 1)
@@ -38,6 +41,10 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 	var mutex sync.Mutex
 	var group sync.WaitGroup
 
+	sort.Slice(transactions, func(i, j int) bool {
+		return transactions[i].Value > transactions[j].Value
+	})
+
 	return &CPUMiner{
 		transactions,
 		utils.SHAToString(bc.LastHash()),
@@ -51,6 +58,17 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 }
 
 func (m *CPUMiner) Mine() *block.Block {
+	p := permutation.New(transaction.Slice(m.transactions))
+
+	for p.Next() && m.found == NotFound {
+		fmt.Println("permuted")
+		m.checkPermutation()
+	}
+
+	return nil
+}
+
+func (m *CPUMiner) checkPermutation() {
 	m.group.Add(m.threads)
 
 	mt := merkle.NewTree(m.transactions)
@@ -61,8 +79,8 @@ func (m *CPUMiner) Mine() *block.Block {
 	for id = 0; id < uint64(m.threads); id++ {
 		go findNonce(id, m, prefix)
 	}
+
 	m.group.Wait()
-	return nil
 }
 
 func findNonce(id uint64, m *CPUMiner, prefix string) {

@@ -9,7 +9,17 @@ import (
 	"gotc/merkle"
 	"gotc/miner"
 	"gotc/transaction"
+	"time"
 )
+
+func spinner(delay time.Duration) {
+	for {
+		for _, r := range `⣽⣾⣷⣯⣟⡿⢿⣻` {
+			fmt.Printf("\r Mining... %c ", r)
+			time.Sleep(delay)
+		}
+	}
+}
 
 func main() {
 	t := transaction.NewTransaction(10)
@@ -30,7 +40,7 @@ func main() {
 	b := block.NewBlock(h, ts)
 	b.Print()
 
-	bc := blockchain.NewBlockchain(3)
+	bc := blockchain.NewBlockchain(2)
 	bc.AddBlock(b)
 
 	h2 := header.NewHeader(2, h.Hash, root)
@@ -40,5 +50,6 @@ func main() {
 	bc.Print()
 
 	m := miner.NewCPUMiner(ts, bc, 4)
+	go spinner(200 * time.Millisecond)
 	m.Mine()
 }
