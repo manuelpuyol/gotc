@@ -4,31 +4,12 @@ import (
 	"bufio"
 	"encoding/json"
 	"gotc/blockchain"
-	"gotc/constants"
 	"gotc/queue"
 	"gotc/utils"
 	"math/rand"
 	"os"
 	"sync"
 )
-
-type PoolCTX struct {
-	missed               []*blockchain.Transaction
-	transactionsPerBlock int
-	shuffles             int
-	processed            int
-}
-
-func newPoolCTX() *PoolCTX {
-	var missed []*blockchain.Transaction
-
-	return &PoolCTX{
-		missed:               missed,
-		transactionsPerBlock: constants.MaxTransactionsPerBlock,
-		shuffles:             0,
-		processed:            0,
-	}
-}
 
 type Pool struct {
 	size    int
@@ -37,6 +18,7 @@ type Pool struct {
 	miners  []Miner
 	bc      *blockchain.Blockchain
 	ctx     *PoolCTX
+	barrier *BarrierCTX
 	Queue   *queue.Queue
 }
 
@@ -56,6 +38,7 @@ func NewPool(size, threads int, inPath, outPath string, bc *blockchain.Blockchai
 		miners:  miners,
 		bc:      bc,
 		ctx:     newPoolCTX(),
+		barrier: newBarrierCTX(threads),
 		Queue:   q,
 	}
 }
