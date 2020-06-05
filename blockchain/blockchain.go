@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"gotc/block"
 	"gotc/utils"
 	"strings"
 	"sync"
@@ -12,8 +11,8 @@ import (
 
 type Blockchain struct {
 	Difficulty int
-	Head       *block.Block
-	Tail       *block.Block
+	Head       *Block
+	Tail       *Block
 	NBlocks    uint
 	mutex      *sync.Mutex
 }
@@ -23,7 +22,7 @@ func NewBlockchain(difficulty int) *Blockchain {
 	return &Blockchain{difficulty, nil, nil, 0, &mutex}
 }
 
-func (bc *Blockchain) AddBlock(b *block.Block) bool {
+func (bc *Blockchain) AddBlock(b *Block) bool {
 	// Dont even lock if block is invalid
 	if !bc.blockValid(b) {
 		return false
@@ -49,7 +48,7 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	return true
 }
 
-func (bc *Blockchain) blockValid(b *block.Block) bool {
+func (bc *Blockchain) blockValid(b *Block) bool {
 	return b.Header.Prev == bc.LastHash()
 }
 

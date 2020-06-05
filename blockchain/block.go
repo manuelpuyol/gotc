@@ -1,22 +1,20 @@
-package block
+package blockchain
 
 import (
 	"encoding/json"
 	"fmt"
 	"gotc/constants"
-	"gotc/header"
-	"gotc/transaction"
 	"gotc/utils"
 )
 
 type Block struct {
-	Header        *header.Header             `json:"header"`
-	Transactions  []*transaction.Transaction `json:"transactions"`
-	NTransactions uint                       `json:"ntransactions"`
+	Header        *Header        `json:"header"`
+	Transactions  []*Transaction `json:"transactions"`
+	NTransactions uint           `json:"ntransactions"`
 	Next          *Block
 }
 
-func NewBlock(h *header.Header, transactions []*transaction.Transaction) *Block {
+func NewBlock(h *Header, transactions []*Transaction) *Block {
 	nTransactions := len(transactions)
 
 	if nTransactions > constants.MaxTransactionsPerBlock {

@@ -1,14 +1,14 @@
 package queue
 
 import (
-	"gotc/transaction"
+	"gotc/blockchain"
 	"sync"
 )
 
 type Queue struct {
 	mutex        *sync.Mutex
 	cond         *sync.Cond
-	transactions []*transaction.Transaction
+	transactions []*blockchain.Transaction
 	Size         int
 }
 
@@ -19,7 +19,7 @@ func NewQueue(cond *sync.Cond) *Queue {
 	return &queue
 }
 
-func (queue *Queue) Enqueue(t *transaction.Transaction) {
+func (queue *Queue) Enqueue(t *blockchain.Transaction) {
 	queue.mutex.Lock()
 	defer queue.mutex.Unlock()
 
@@ -27,7 +27,7 @@ func (queue *Queue) Enqueue(t *transaction.Transaction) {
 	queue.Size++
 }
 
-func (queue *Queue) Dequeue() *transaction.Transaction {
+func (queue *Queue) Dequeue() *blockchain.Transaction {
 	queue.mutex.Lock()
 	defer queue.mutex.Unlock()
 

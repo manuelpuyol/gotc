@@ -2,13 +2,10 @@ package miner
 
 import (
 	"fmt"
-	"gotc/block"
 	"gotc/blockchain"
 	"gotc/constants"
 	"gotc/hash"
-	"gotc/header"
 	"gotc/merkle"
-	"gotc/transaction"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -18,11 +15,11 @@ import (
 
 type Miner interface {
 	Mine() bool
-	Reset(t []*transaction.Transaction)
+	Reset(t []*blockchain.Transaction)
 }
 
 type CPUMiner struct {
-	transactions []*transaction.Transaction
+	transactions []*blockchain.Transaction
 	bc           *blockchain.Blockchain
 	prev         string
 	found        int32
@@ -38,7 +35,7 @@ type MinerCTX struct {
 	threads int
 }
 
-func NewMinerCTX(threads int) *MinerCTX {
+func newMinerCTX(threads int) *MinerCTX {
 	var mutex sync.Mutex
 	var group sync.WaitGroup
 	cond := sync.NewCond(&mutex)
@@ -58,11 +55,11 @@ func NewCPUMiner(bc *blockchain.Blockchain, threads int) Miner {
 		prev:  bc.LastHash(),
 		found: constants.NotFound,
 		nonce: 0,
-		ctx:   NewCTX(threads),
+		ctx:   newMinerCTX(threads),
 	}
 }
 
-func (m *CPUMiner) Reset(t []*transaction.Transaction) {
+func (m *CPUMiner) Reset(t []*blockchain.Transaction) {
 	m.transactions = t
 	m.prev = m.bc.LastHash()
 	m.found = constants.NotFound
@@ -72,7 +69,7 @@ func (m *CPUMiner) Reset(t []*transaction.Transaction) {
 }
 
 func (m *CPUMiner) Mine() bool {
-	p := permutation.New(transaction.Slice(m.transactions))
+	p := permutation.New(blockchain.Slice(m.transactions))
 
 	for m.found == constants.NotFound && p.Next() {
 		m.checkPermutation()
@@ -93,8 +90,8 @@ func (m *CPUMiner) Mine() bool {
 
 func (m *CPUMiner) sendBlock() bool {
 	mt := merkle.NewTree(m.transactions)
-	h := header.NewHeader(m.nonce, m.prev, mt.GetRoot())
-	b := block.NewBlock(h, m.transactions)
+	h := blockchain.NewHeader(m.nonce, m.prev, mt.GetRoot())
+	b := blockchain.NewBlock(h, m.transactions)
 
 	return m.bc.AddBlock(b)
 }

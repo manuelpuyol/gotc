@@ -1,15 +1,15 @@
 package merkle
 
 import (
+	"gotc/blockchain"
 	"gotc/hash"
-	"gotc/transaction"
 )
 
 type Tree struct {
 	leaves []string
 }
 
-func NewTree(transactions []*transaction.Transaction) *Tree {
+func NewTree(transactions []*blockchain.Transaction) *Tree {
 	var leaves []string
 
 	for _, t := range transactions {

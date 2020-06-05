@@ -5,14 +5,13 @@ import (
 	"gotc/blockchain"
 	"gotc/constants"
 	"gotc/queue"
-	"gotc/transaction"
 	"gotc/utils"
 	"os"
 	"sync"
 )
 
 type PoolCTX struct {
-	missed               []*transaction.Transaction
+	missed               []*blockchain.Transaction
 	bc                   *blockchain.Blockchain
 	transactionsPerBlock int
 	shuffles             int
@@ -20,7 +19,7 @@ type PoolCTX struct {
 }
 
 func newPoolCTX(bc *blockchain.Blockchain) *PoolCTX {
-	var missed []*transaction.Transaction
+	var missed []*blockchain.Transaction
 
 	return &PoolCTX{
 		missed:               missed,
@@ -62,7 +61,7 @@ func (p *Pool) Prepare(inPath string) {
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
-		t := transaction.NewTransactionFromJSON(scanner.Bytes())
+		t := blockchain.NewTransactionFromJSON(scanner.Bytes())
 		p.q.Enqueue(t)
 	}
 }
