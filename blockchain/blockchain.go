@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gotc/block"
+	"gotc/utils"
 	"strings"
 	"sync"
 )
@@ -65,6 +66,7 @@ func (bc *Blockchain) ToJSON() map[string]interface{} {
 }
 
 func (bc *Blockchain) Print() {
-	j, _ := json.MarshalIndent(bc.ToJSON(), "", "  ")
+	j, err := json.MarshalIndent(bc.ToJSON(), "", "  ")
+	utils.CheckErr(err)
 	fmt.Println(string(j))
 }

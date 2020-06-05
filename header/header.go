@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gotc/hash"
+	"gotc/utils"
 	"strconv"
 )
 
@@ -30,6 +31,7 @@ func (h *Header) ToJSON() map[string]interface{} {
 }
 
 func (h *Header) Print() {
-	j, _ := json.MarshalIndent(h.ToJSON(), "", "  ")
+	j, err := json.MarshalIndent(h.ToJSON(), "", "  ")
+	utils.CheckErr(err)
 	fmt.Println(string(j))
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gotc/header"
 	"gotc/transaction"
+	"gotc/utils"
 )
 
 type Block struct {
@@ -32,6 +33,7 @@ func (b *Block) ToJSON() map[string]interface{} {
 }
 
 func (b *Block) Print() {
-	j, _ := json.MarshalIndent(b.ToJSON(), "", "  ")
+	j, err := json.MarshalIndent(b.ToJSON(), "", "  ")
+	utils.CheckErr(err)
 	fmt.Println(string(j))
 }

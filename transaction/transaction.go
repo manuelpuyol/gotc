@@ -31,9 +31,7 @@ func NewTransactionFromJSON(bytes []byte) *Transaction {
 	t := Transaction{}
 	err := json.Unmarshal(bytes, &t)
 
-	if err != nil {
-		panic(err)
-	}
+	utils.CheckErr(err)
 
 	t.setHash()
 
@@ -54,6 +52,7 @@ func (t *Transaction) ToJSON() map[string]interface{} {
 }
 
 func (t *Transaction) Print() {
-	j, _ := json.MarshalIndent(t.ToJSON(), "", "  ")
+	j, err := json.MarshalIndent(t.ToJSON(), "", "  ")
+	utils.CheckErr(err)
 	fmt.Println(string(j))
 }

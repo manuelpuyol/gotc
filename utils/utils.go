@@ -19,3 +19,9 @@ func RandomBytes() []byte {
 func randomInt(min, max int) int {
 	return min + rand.Intn(max-min)
 }
+
+func CheckErr(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
