@@ -2,18 +2,15 @@ package utils
 
 import (
 	"fmt"
+	"gotc/constants"
 	"math/rand"
 	"time"
 )
 
-const ASCIIStart = 65
-const ASCIIEnd = 90
-const Length = 10
-
 func RandomBytes() []byte {
-	bytes := make([]byte, Length)
-	for i := 0; i < Length; i++ {
-		bytes[i] = byte(randomInt(ASCIIStart, ASCIIEnd))
+	bytes := make([]byte, constants.Length)
+	for i := 0; i < constants.Length; i++ {
+		bytes[i] = byte(randomInt(constants.ASCIIStart, constants.ASCIIEnd))
 	}
 	return bytes
 }

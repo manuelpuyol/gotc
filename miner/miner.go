@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gotc/block"
 	"gotc/blockchain"
+	"gotc/constants"
 	"gotc/hash"
 	"gotc/header"
 	"gotc/merkle"
@@ -14,11 +15,6 @@ import (
 
 	"github.com/gitchander/permutation"
 )
-
-const Uint64Size = 64 << (^uint(0) >> 64 & 1)
-const MaxUint64 uint64 = 1<<Uint64Size - 1
-const NotFound = -1
-const Found = 1
 
 type Miner interface {
 	Mine() *block.Block
@@ -44,7 +40,7 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 		bc.LastHash(),
 		bc.Difficulty,
 		threads,
-		NotFound,
+		constants.NotFound,
 		0,
 		&mutex,
 		&group,
@@ -54,11 +50,11 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 func (m *CPUMiner) Mine() *block.Block {
 	p := permutation.New(transaction.Slice(m.transactions))
 
-	for m.found == NotFound && p.Next() {
+	for m.found == constants.NotFound && p.Next() {
 		m.checkPermutation()
 	}
 
-	if m.found == Found {
+	if m.found == constants.Found {
 		mt := merkle.NewTree(m.transactions)
 		h := header.NewHeader(m.nonce, m.prev, mt.GetRoot())
 		return block.NewBlock(h, m.transactions)
@@ -83,23 +79,23 @@ func (m *CPUMiner) checkPermutation() {
 }
 
 func findNonce(id uint64, m *CPUMiner, prefix string) {
-	bucket := MaxUint64 / uint64(m.threads)
+	bucket := constants.MaxUint64 / uint64(m.threads)
 	nonce := id * bucket
 	var max uint64
 
 	if id == uint64(m.threads-1) {
-		max = MaxUint64
+		max = constants.MaxUint64
 	} else {
 		max = (id + 1) * bucket
 	}
 
 	h := hash.NewHash(m.difficulty)
 
-	for nonce < max && m.found == NotFound {
+	for nonce < max && m.found == constants.NotFound {
 		test := prefix + strconv.FormatUint(nonce, 10)
 
 		if h.IsValid(test) {
-			if atomic.CompareAndSwapInt32(&m.found, NotFound, Found) {
+			if atomic.CompareAndSwapInt32(&m.found, constants.NotFound, constants.Found) {
 				fmt.Println("\nGoroutine ", id, " found a block")
 				fmt.Println("Nonce = ", nonce)
 				fmt.Println("Hash = ", hash.BTCHash(test))
