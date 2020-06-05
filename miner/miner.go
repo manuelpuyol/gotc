@@ -25,25 +25,40 @@ type CPUMiner struct {
 	transactions []*transaction.Transaction
 	bc           *blockchain.Blockchain
 	prev         string
-	threads      int
 	found        int32
 	nonce        uint64
-	mutex        *sync.Mutex
-	group        *sync.WaitGroup
+	ctx          *CTX
+}
+
+type CTX struct {
+	mutex   *sync.Mutex
+	cond    *sync.Cond
+	group   *sync.WaitGroup
+	counter int
+	threads int
+}
+
+func NewCTX(threads int) *CTX {
+	var mutex sync.Mutex
+	var group sync.WaitGroup
+	cond := sync.NewCond(&mutex)
+
+	return &CTX{
+		mutex:   &mutex,
+		group:   &group,
+		cond:    cond,
+		counter: 0,
+		threads: threads,
+	}
 }
 
 func NewCPUMiner(bc *blockchain.Blockchain, threads int) Miner {
-	var mutex sync.Mutex
-	var group sync.WaitGroup
-
 	return &CPUMiner{
-		bc:      bc,
-		prev:    bc.LastHash(),
-		threads: threads,
-		found:   constants.NotFound,
-		nonce:   0,
-		mutex:   &mutex,
-		group:   &group,
+		bc:    bc,
+		prev:  bc.LastHash(),
+		found: constants.NotFound,
+		nonce: 0,
+		ctx:   NewCTX(threads),
 	}
 }
 
@@ -52,6 +67,8 @@ func (m *CPUMiner) Reset(t []*transaction.Transaction) {
 	m.prev = m.bc.LastHash()
 	m.found = constants.NotFound
 	m.nonce = 0
+
+	m.ctx.counter = 0
 }
 
 func (m *CPUMiner) Mine() bool {
@@ -87,13 +104,13 @@ func (m *CPUMiner) checkPermutation() {
 	root := mt.GetRoot()
 	prefix := m.prev + root
 
-	if m.threads > 0 {
-		m.group.Add(m.threads)
+	if m.ctx.threads > 0 {
+		m.ctx.group.Add(m.ctx.threads)
 		var id uint64
-		for id = 0; id < uint64(m.threads); id++ {
+		for id = 0; id < uint64(m.ctx.threads); id++ {
 			go findNonce(id, m, prefix)
 		}
-		m.group.Wait()
+		m.ctx.group.Wait()
 	} else {
 		findNonce(0, m, prefix)
 	}
@@ -102,14 +119,14 @@ func (m *CPUMiner) checkPermutation() {
 func findNonce(id uint64, m *CPUMiner, prefix string) {
 	bucket := constants.MaxUint64
 
-	if m.threads > 0 {
-		bucket /= uint64(m.threads)
+	if m.ctx.threads > 0 {
+		bucket /= uint64(m.ctx.threads)
 	}
 
 	nonce := id * bucket
 
 	var max uint64
-	if m.threads == 0 || id == uint64(m.threads-1) {
+	if m.ctx.threads == 0 || id == uint64(m.ctx.threads-1) {
 		max = constants.MaxUint64
 	} else {
 		max = (id + 1) * bucket
@@ -132,7 +149,20 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 		nonce++
 	}
 
-	if m.threads > 0 {
-		m.group.Done()
+	if m.ctx.threads > 0 {
+		// Barrier
+		m.ctx.mutex.Lock()
+		m.ctx.counter++
+		if m.ctx.counter == m.ctx.threads {
+			m.ctx.cond.Broadcast()
+		} else {
+			for m.ctx.counter != m.ctx.threads {
+				m.ctx.cond.Wait()
+			}
+		}
+		m.ctx.mutex.Unlock()
+
+		// Everyone finished
+		m.ctx.group.Done()
 	}
 }
