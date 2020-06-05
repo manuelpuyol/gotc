@@ -7,7 +7,7 @@
 
 - Block
   - has a header
-  - has multiple transactions (simple slice)
+  - has multiple transactions (can only have up to 5 transactions)
   - holds the number of transactions
 
 - Header

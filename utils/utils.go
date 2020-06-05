@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"math/rand"
+	"time"
 )
 
 const ASCIIStart = 65
@@ -23,5 +25,14 @@ func randomInt(min, max int) int {
 func CheckErr(e error) {
 	if e != nil {
 		panic(e)
+	}
+}
+
+func Spinner(delay time.Duration) {
+	for {
+		for _, r := range `⣽⣾⣷⣯⣟⡿⢿⣻` {
+			fmt.Printf("\r Mining... %c ", r)
+			time.Sleep(delay)
+		}
 	}
 }

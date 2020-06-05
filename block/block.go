@@ -3,6 +3,7 @@ package block
 import (
 	"encoding/json"
 	"fmt"
+	"gotc/constants"
 	"gotc/header"
 	"gotc/transaction"
 	"gotc/utils"
@@ -16,7 +17,13 @@ type Block struct {
 }
 
 func NewBlock(h *header.Header, transactions []*transaction.Transaction) *Block {
-	return &Block{h, transactions, uint(len(transactions)), nil}
+	nTransactions := len(transactions)
+
+	if nTransactions > constants.MaxTransactionsPerBlock {
+		panic("Block with more transactions than allowed")
+	}
+
+	return &Block{h, transactions, uint(nTransactions), nil}
 }
 
 func (b *Block) ToJSON() map[string]interface{} {

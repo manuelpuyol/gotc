@@ -100,7 +100,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 
 		if h.IsValid(test) {
 			if atomic.CompareAndSwapInt32(&m.found, NotFound, Found) {
-				fmt.Println("\nThread ", id, " found a block")
+				fmt.Println("\nGoroutine ", id, " found a block")
 				fmt.Println("Nonce = ", nonce)
 				fmt.Println("Hash = ", hash.BTCHash(test))
 				m.nonce = nonce

@@ -4,16 +4,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"gotc/blockchain"
+	"gotc/constants"
 	"gotc/miner"
 	"gotc/transaction"
 	"gotc/utils"
 	"os"
 	"time"
 )
-
-const SpinnerDelay = 100
 
 type CTX struct {
 	transactions []*transaction.Transaction
@@ -47,13 +45,32 @@ func main() {
 }
 
 func processTransactions(ctx *CTX) {
-	m := miner.NewCPUMiner(ctx.transactions, ctx.bc, ctx.threads)
+	processed := 0
+	transactionsCount := len(ctx.transactions)
 
-	go spinner(SpinnerDelay * time.Millisecond)
+	go utils.Spinner(constants.SpinnerDelay * time.Millisecond)
 
-	b := m.Mine()
+	for processed < transactionsCount {
+		transactions := getTransactions(ctx, processed, transactionsCount)
 
-	ctx.bc.AddBlock(b)
+		m := miner.NewCPUMiner(transactions, ctx.bc, ctx.threads)
+
+		b := m.Mine()
+
+		ctx.bc.AddBlock(b)
+
+		processed += constants.MaxTransactionsPerBlock
+	}
+}
+
+func getTransactions(ctx *CTX, processed, transactionsCount int) []*transaction.Transaction {
+	end := processed + constants.MaxTransactionsPerBlock
+
+	if processed > transactionsCount {
+		end = transactionsCount
+	}
+
+	return ctx.transactions[processed:end]
 }
 
 func writeBlockchain(bc *blockchain.Blockchain, path string) {
@@ -82,13 +99,4 @@ func readTransactions(inPath string) []*transaction.Transaction {
 	}
 
 	return transactions
-}
-
-func spinner(delay time.Duration) {
-	for {
-		for _, r := range `⣽⣾⣷⣯⣟⡿⢿⣻` {
-			fmt.Printf("\r Mining... %c ", r)
-			time.Sleep(delay)
-		}
-	}
 }
