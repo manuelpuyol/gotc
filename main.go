@@ -4,53 +4,60 @@ import (
 	"bufio"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"gotc/blockchain"
 	"gotc/constants"
 	"gotc/miner"
 	"gotc/transaction"
 	"gotc/utils"
+	"math/rand"
 	"os"
 )
 
 type CTX struct {
-	transactions []*transaction.Transaction
-	missed       []*transaction.Transaction
-	bc           *blockchain.Blockchain
-	threads      int
+	transactions         []*transaction.Transaction
+	missed               []*transaction.Transaction
+	bc                   *blockchain.Blockchain
+	threads              int
+	transactionsPerBlock int
+	shuffles             int
 }
 
 func newCTX(difficulty, threads int, inPath string) *CTX {
 	var missed []*transaction.Transaction
 	return &CTX{
-		transactions: readTransactions(inPath),
-		missed:       missed,
-		bc:           blockchain.NewBlockchain(difficulty),
-		threads:      threads,
+		transactions:         readTransactions(inPath),
+		missed:               missed,
+		bc:                   blockchain.NewBlockchain(difficulty),
+		threads:              threads,
+		transactionsPerBlock: constants.MaxTransactionsPerBlock,
+		shuffles:             0,
 	}
 }
 
 func main() {
-	difficulty := flag.Int("d", 5, "The number of trailing 0s needed for a block to be valid (Default 5)")
-	inPath := flag.String(
-		"f",
-		"data/transactions.txt",
-		"Path to the file which contains the transactions to be read (Default data/transactions.txt)",
-	)
-	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain (Default data/blockchain.json)")
-	threads := flag.Int("p", 0, "An optional flag to run the miner in its parallel version.")
+	difficulty := flag.Int("d", 5, "The number of trailing 0s needed for a block to be valid")
+	inPath := flag.String("f", "data/transactions.txt", "Path to the file which contains the transactions to be read")
+	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain")
+	threads := flag.Int("p", 0, "The number of threads to run, defaults to 0 (serial implementation).")
 	flag.Parse()
 
 	ctx := newCTX(*difficulty, *threads, *inPath)
 
-	processTransactions(ctx)
+	go utils.Spinner("Mining...")
+
+	minedAll := processTransactions(ctx)
+
+	if !minedAll {
+		fmt.Println("\nCould not find blocks for some transactions")
+	}
+
 	writeBlockchain(ctx.bc, *outPath)
 }
 
-func processTransactions(ctx *CTX) {
+func processTransactions(ctx *CTX) bool {
 	processed := 0
 	transactionsCount := len(ctx.transactions)
-
-	go utils.Spinner("Mining...")
 
 	for processed < transactionsCount {
 		transactions := getTransactions(ctx, processed, transactionsCount)
@@ -60,14 +67,64 @@ func processTransactions(ctx *CTX) {
 		if !m.Mine() {
 			ctx.missed = append(ctx.missed, transactions...)
 		}
-		processed += constants.MaxTransactionsPerBlock
+		processed += ctx.transactionsPerBlock
 	}
+
+	if len(ctx.missed) > 0 {
+		return retryMissedTransactions(ctx)
+	}
+
+	return true
+}
+
+func retryMissedTransactions(ctx *CTX) bool {
+	size := len(ctx.missed)
+	maxShuffles := size * 5
+
+	if size > ctx.transactionsPerBlock && ctx.shuffles < maxShuffles {
+		ctx.shuffles++
+		return suffleAndProcess(ctx)
+	}
+	if ctx.transactionsPerBlock > 0 {
+		ctx.shuffles = 0
+		return splitAndProcess(ctx)
+	}
+
+	return false
+}
+
+func suffleAndProcess(ctx *CTX) bool {
+	transactions := ctx.missed
+	rand.Shuffle(len(transactions), func(i, j int) {
+		transactions[i], transactions[j] = transactions[j], transactions[i]
+	})
+
+	var missed []*transaction.Transaction
+	ctx.transactions = transactions
+	ctx.missed = missed
+
+	return processTransactions(ctx)
+}
+
+func splitAndProcess(ctx *CTX) bool {
+	transactions := ctx.missed
+	var missed []*transaction.Transaction
+	ctx.transactions = transactions
+	ctx.missed = missed
+
+	ctx.transactionsPerBlock--
+
+	if ctx.transactionsPerBlock == 0 {
+		return false
+	}
+
+	return processTransactions(ctx)
 }
 
 func getTransactions(ctx *CTX, processed, transactionsCount int) []*transaction.Transaction {
-	end := processed + constants.MaxTransactionsPerBlock
+	end := processed + ctx.transactionsPerBlock
 
-	if processed > transactionsCount {
+	if end > transactionsCount {
 		end = transactionsCount
 	}
 
