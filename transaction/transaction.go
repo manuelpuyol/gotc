@@ -9,19 +9,39 @@ import (
 )
 
 type Transaction struct {
-	Value    uint64
-	Sender   string
-	Receiver string
+	Value    uint64 `json:"value"`
+	Sender   string `json:"sender"`
+	Receiver string `json:"receiver"`
 	Hash     string
 }
 
 func NewTransaction(value uint64) *Transaction {
-	sender := hash.ByteHash(utils.RandomBytes())
-	receiver := hash.ByteHash(utils.RandomBytes())
+	t := Transaction{
+		Value:    value,
+		Sender:   hash.ByteHash(utils.RandomBytes()),
+		Receiver: hash.ByteHash(utils.RandomBytes()),
+	}
 
-	h := hash.StrHash(sender + receiver + strconv.FormatUint(value, 10))
+	t.setHash()
 
-	return &Transaction{value, sender, receiver, h}
+	return &t
+}
+
+func NewTransactionFromJSON(bytes []byte) *Transaction {
+	t := Transaction{}
+	err := json.Unmarshal(bytes, &t)
+
+	if err != nil {
+		panic(err)
+	}
+
+	t.setHash()
+
+	return &t
+}
+
+func (t *Transaction) setHash() {
+	t.Hash = hash.StrHash(t.Sender + t.Receiver + strconv.FormatUint(t.Value, 10))
 }
 
 func (t *Transaction) ToJSON() map[string]interface{} {
