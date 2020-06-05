@@ -24,12 +24,18 @@ func NewBlockchain(difficulty int) *Blockchain {
 }
 
 func (bc *Blockchain) AddBlock(b *block.Block) bool {
-	if b.Header.Prev != bc.LastHash() {
+	// Dont even lock if block is invalid
+	if !bc.blockValid(b) {
 		return false
 	}
 
 	bc.mutex.Lock()
 	defer bc.mutex.Unlock()
+
+	// Verify again since `Lock` could have blocked and BC changed in the meantime
+	if !bc.blockValid(b) {
+		return false
+	}
 
 	if bc.Head == nil {
 		bc.Head = b
@@ -41,6 +47,10 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	bc.NBlocks++
 
 	return true
+}
+
+func (bc *Blockchain) blockValid(b *block.Block) bool {
+	return b.Header.Prev == bc.LastHash()
 }
 
 func (bc *Blockchain) LastHash() string {
