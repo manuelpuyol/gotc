@@ -83,26 +83,33 @@ func (m *CPUMiner) sendBlock() bool {
 }
 
 func (m *CPUMiner) checkPermutation() {
-	m.group.Add(m.threads)
-
 	mt := merkle.NewTree(m.transactions)
 	root := mt.GetRoot()
 	prefix := m.prev + root
 
-	var id uint64
-	for id = 0; id < uint64(m.threads); id++ {
-		go findNonce(id, m, prefix)
+	if m.threads > 0 {
+		m.group.Add(m.threads)
+		var id uint64
+		for id = 0; id < uint64(m.threads); id++ {
+			go findNonce(id, m, prefix)
+		}
+		m.group.Wait()
+	} else {
+		findNonce(0, m, prefix)
 	}
-
-	m.group.Wait()
 }
 
 func findNonce(id uint64, m *CPUMiner, prefix string) {
-	bucket := constants.MaxUint64 / uint64(m.threads)
-	nonce := id * bucket
-	var max uint64
+	bucket := constants.MaxUint64
 
-	if id == uint64(m.threads-1) {
+	if m.threads > 0 {
+		bucket /= uint64(m.threads)
+	}
+
+	nonce := id * bucket
+
+	var max uint64
+	if m.threads == 0 || id == uint64(m.threads-1) {
 		max = constants.MaxUint64
 	} else {
 		max = (id + 1) * bucket
@@ -125,5 +132,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 		nonce++
 	}
 
-	m.group.Done()
+	if m.threads > 0 {
+		m.group.Done()
+	}
 }

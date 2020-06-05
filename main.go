@@ -21,6 +21,7 @@ type CTX struct {
 	bc                   *blockchain.Blockchain
 	transactionsPerBlock int
 	shuffles             int
+	processed            int
 }
 
 func newCTX(difficulty, threads int, inPath string) *CTX {
@@ -35,6 +36,7 @@ func newCTX(difficulty, threads int, inPath string) *CTX {
 		bc:                   bc,
 		transactionsPerBlock: constants.MaxTransactionsPerBlock,
 		shuffles:             0,
+		processed:            0,
 	}
 }
 
@@ -67,7 +69,7 @@ func processTransactions(ctx *CTX) bool {
 	transactionsCount := len(ctx.transactions)
 
 	for processed < transactionsCount {
-		transactions := getTransactions(ctx, processed, transactionsCount)
+		transactions := getTransactions(ctx)
 		ctx.m.Reset(transactions)
 
 		if !ctx.m.Mine() {
@@ -85,7 +87,7 @@ func processTransactions(ctx *CTX) bool {
 
 func retryMissedTransactions(ctx *CTX) bool {
 	size := len(ctx.missed)
-	maxShuffles := size * 5
+	maxShuffles := size * size
 
 	if size > ctx.transactionsPerBlock && ctx.shuffles < maxShuffles {
 		ctx.shuffles++
@@ -127,14 +129,15 @@ func splitAndProcess(ctx *CTX) bool {
 	return processTransactions(ctx)
 }
 
-func getTransactions(ctx *CTX, processed, transactionsCount int) []*transaction.Transaction {
-	end := processed + ctx.transactionsPerBlock
+func getTransactions(ctx *CTX) []*transaction.Transaction {
+	end := ctx.processed + ctx.transactionsPerBlock
+	transactionsCount := len(ctx.transactions)
 
 	if end > transactionsCount {
 		end = transactionsCount
 	}
 
-	return ctx.transactions[processed:end]
+	return ctx.transactions[ctx.processed:end]
 }
 
 func writeBlockchain(bc *blockchain.Blockchain, path string) {
