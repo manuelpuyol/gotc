@@ -6,7 +6,6 @@ import (
 	"gotc/block"
 	"gotc/blockchain"
 	"gotc/header"
-	"gotc/merkle"
 	"gotc/miner"
 	"gotc/transaction"
 	"time"
@@ -21,35 +20,43 @@ func spinner(delay time.Duration) {
 	}
 }
 
-func main() {
-	t := transaction.NewTransaction(10)
-	t.Print()
-
+func mockInitialHeader() *header.Header {
 	var prev [sha256.Size]byte
 	root := sha256.Sum256([]byte("root"))
-	h := header.NewHeader(1, prev, root)
-	h.Print()
+	return header.NewHeader(1, prev, root)
+}
 
-	var ts []*transaction.Transaction
-	ts = append(ts, t)
-	ts = append(ts, transaction.NewTransaction(20))
+func setupBlockchain() *blockchain.Blockchain {
+	bc := blockchain.NewBlockchain(6)
 
-	mt := merkle.NewTree(ts)
-	fmt.Printf("merkle = %x\n", mt.GetRoot())
+	t := transaction.NewTransaction(10)
+	h := mockInitialHeader()
 
+	ts := []*transaction.Transaction{t}
 	b := block.NewBlock(h, ts)
-	b.Print()
 
-	bc := blockchain.NewBlockchain(2)
 	bc.AddBlock(b)
 
-	h2 := header.NewHeader(2, h.Hash, root)
-	b2 := block.NewBlock(h2, ts)
+	return bc
+}
 
-	bc.AddBlock(b2)
-	bc.Print()
+func main() {
+	bc := setupBlockchain()
+
+	t1 := transaction.NewTransaction(20)
+	t2 := transaction.NewTransaction(30)
+
+	ts := []*transaction.Transaction{t1, t2}
 
 	m := miner.NewCPUMiner(ts, bc, 4)
+
 	go spinner(200 * time.Millisecond)
-	m.Mine()
+
+	b := m.Mine()
+
+	if b != nil {
+		bc.AddBlock(b)
+	}
+
+	bc.Print()
 }

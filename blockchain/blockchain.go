@@ -27,6 +27,8 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	}
 
 	bc.mutex.Lock()
+	defer bc.mutex.Unlock()
+
 	if bc.Head == nil {
 		bc.Head = b
 	}
@@ -35,7 +37,6 @@ func (bc *Blockchain) AddBlock(b *block.Block) bool {
 	}
 	bc.Tail = b
 	bc.NBlocks++
-	bc.mutex.Unlock()
 
 	return true
 }
