@@ -17,13 +17,13 @@ import (
 )
 
 type Miner interface {
-	Mine() *block.Block
+	Mine() bool
 }
 
 type CPUMiner struct {
 	transactions []*transaction.Transaction
+	bc           *blockchain.Blockchain
 	prev         string
-	difficulty   int
 	threads      int
 	found        int32
 	nonce        uint64
@@ -37,8 +37,8 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 
 	return &CPUMiner{
 		transactions,
+		bc,
 		bc.LastHash(),
-		bc.Difficulty,
 		threads,
 		constants.NotFound,
 		0,
@@ -47,7 +47,14 @@ func NewCPUMiner(transactions []*transaction.Transaction, bc *blockchain.Blockch
 	}
 }
 
-func (m *CPUMiner) Mine() *block.Block {
+func (m *CPUMiner) Reset(t []*transaction.Transaction) {
+	m.transactions = t
+	m.prev = m.bc.LastHash()
+	m.found = constants.NotFound
+	m.nonce = 0
+}
+
+func (m *CPUMiner) Mine() bool {
 	p := permutation.New(transaction.Slice(m.transactions))
 
 	for m.found == constants.NotFound && p.Next() {
@@ -55,12 +62,24 @@ func (m *CPUMiner) Mine() *block.Block {
 	}
 
 	if m.found == constants.Found {
-		mt := merkle.NewTree(m.transactions)
-		h := header.NewHeader(m.nonce, m.prev, mt.GetRoot())
-		return block.NewBlock(h, m.transactions)
+		if m.sendBlock() {
+			return true
+		}
+
+		// another miner beat me to it, so I have to mine again
+		m.Reset(m.transactions)
+		m.Mine()
 	}
 
-	return nil
+	return false
+}
+
+func (m *CPUMiner) sendBlock() bool {
+	mt := merkle.NewTree(m.transactions)
+	h := header.NewHeader(m.nonce, m.prev, mt.GetRoot())
+	b := block.NewBlock(h, m.transactions)
+
+	return m.bc.AddBlock(b)
 }
 
 func (m *CPUMiner) checkPermutation() {
@@ -89,7 +108,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 		max = (id + 1) * bucket
 	}
 
-	h := hash.NewHash(m.difficulty)
+	h := hash.NewHash(m.bc.Difficulty)
 
 	for nonce < max && m.found == constants.NotFound {
 		test := prefix + strconv.FormatUint(nonce, 10)

@@ -14,13 +14,16 @@ import (
 
 type CTX struct {
 	transactions []*transaction.Transaction
+	missed       []*transaction.Transaction
 	bc           *blockchain.Blockchain
 	threads      int
 }
 
 func newCTX(difficulty, threads int, inPath string) *CTX {
+	var missed []*transaction.Transaction
 	return &CTX{
 		transactions: readTransactions(inPath),
+		missed:       missed,
 		bc:           blockchain.NewBlockchain(difficulty),
 		threads:      threads,
 	}
@@ -54,10 +57,9 @@ func processTransactions(ctx *CTX) {
 
 		m := miner.NewCPUMiner(transactions, ctx.bc, ctx.threads)
 
-		b := m.Mine()
-
-		ctx.bc.AddBlock(b)
-
+		if !m.Mine() {
+			ctx.missed = append(ctx.missed, transactions...)
+		}
 		processed += constants.MaxTransactionsPerBlock
 	}
 }
