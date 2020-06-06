@@ -26,6 +26,7 @@ run_timings() {
   (time ./main -d 6 -p 8) > out.txt 2> timings/d6/parallel_8-$n.txt
 }
 
+rm -rf timings/
 mkdir timings
 mkdir timings/d4
 mkdir timings/d5
