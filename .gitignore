@@ -2,3 +2,5 @@
 .orig
 main
 data/blockchain.json
+out.txt
+timings/
