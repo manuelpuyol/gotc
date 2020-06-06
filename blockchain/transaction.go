@@ -9,13 +9,13 @@ import (
 )
 
 type Transaction struct {
-	Value    uint64 `json:"value"`
+	Value    uint32 `json:"value"`
 	Sender   string `json:"sender"`
 	Receiver string `json:"receiver"`
 	Hash     string
 }
 
-func NewTransaction(value uint64) *Transaction {
+func NewTransaction(value uint32) *Transaction {
 	t := Transaction{
 		Value:    value,
 		Sender:   hash.ByteHash(utils.RandomBytes()),
@@ -39,7 +39,7 @@ func NewTransactionFromJSON(bytes []byte) *Transaction {
 }
 
 func (t *Transaction) setHash() {
-	t.Hash = hash.StrHash(t.Sender + t.Receiver + strconv.FormatUint(t.Value, 10))
+	t.Hash = hash.StrHash(t.Sender + t.Receiver + strconv.FormatUint(uint64(t.Value), 10))
 }
 
 func (t *Transaction) ToJSON() map[string]interface{} {

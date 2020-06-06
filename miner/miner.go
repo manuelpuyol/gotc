@@ -23,7 +23,7 @@ type CPUMiner struct {
 	bc           *blockchain.Blockchain
 	prev         string
 	found        int32
-	nonce        uint64
+	nonce        uint32
 	id           int
 	barrier      *sync.Barrier
 }
@@ -91,8 +91,8 @@ func (m *CPUMiner) checkPermutation() {
 
 	if m.barrier.Threads > 0 {
 		m.barrier.Start()
-		var id uint64
-		for id = 0; id < uint64(m.barrier.Threads); id++ {
+		var id uint32
+		for id = 0; id < uint32(m.barrier.Threads); id++ {
 			go findNonce(id, m, prefix)
 		}
 		m.barrier.Wait()
@@ -101,18 +101,18 @@ func (m *CPUMiner) checkPermutation() {
 	}
 }
 
-func findNonce(id uint64, m *CPUMiner, prefix string) {
-	bucket := constants.MaxUint64
+func findNonce(id uint32, m *CPUMiner, prefix string) {
+	bucket := constants.MaxUint32
 
 	if m.barrier.Threads > 0 {
-		bucket /= uint64(m.barrier.Threads)
+		bucket /= uint32(m.barrier.Threads)
 	}
 
 	nonce := id * bucket
 
-	var max uint64
-	if m.barrier.Threads == 0 || id == uint64(m.barrier.Threads-1) {
-		max = constants.MaxUint64
+	var max uint32
+	if m.barrier.Threads == 0 || id == uint32(m.barrier.Threads-1) {
+		max = constants.MaxUint32
 	} else {
 		max = (id + 1) * bucket
 	}
@@ -120,7 +120,7 @@ func findNonce(id uint64, m *CPUMiner, prefix string) {
 	h := hash.NewHash(m.bc.Difficulty)
 
 	for nonce < max && m.found == constants.NotFound {
-		test := prefix + strconv.FormatUint(nonce, 10)
+		test := prefix + strconv.FormatUint(uint64(nonce), 10)
 
 		if h.IsValid(test) {
 			if atomic.CompareAndSwapInt32(&m.found, constants.NotFound, constants.Found) {
