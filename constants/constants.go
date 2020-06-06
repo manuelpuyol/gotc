@@ -9,3 +9,5 @@ const Found = 1
 const ASCIIStart = 65
 const ASCIIEnd = 90
 const Length = 10
+
+var Benchmark = false

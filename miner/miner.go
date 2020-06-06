@@ -74,7 +74,7 @@ func (m *CPUMiner) sendBlock() bool {
 
 	res := m.bc.AddBlock(blockchain.NewBlock(h, m.transactions))
 
-	if res {
+	if res && !constants.Benchmark {
 		fmt.Println("\nMiner", m.id, "found a block")
 		fmt.Println("Nonce = ", m.nonce)
 		fmt.Println("Hash = ", h.Hash)

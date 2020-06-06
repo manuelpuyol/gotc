@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"gotc/blockchain"
+	"gotc/constants"
 	"gotc/miner"
 	"gotc/utils"
 )
@@ -14,8 +15,11 @@ func main() {
 	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain")
 	miners := flag.Int("m", 1, "The number of miners to spawn")
 	threads := flag.Int("p", 0, "The number of threads for each miner to run, defaults to 0 (serial implementation).")
+	benchmark := flag.Bool("b", false, "Enable benchmark mode (disable output)")
 
 	flag.Parse()
+
+	constants.Benchmark = *benchmark
 
 	if *miners == 0 {
 		fmt.Println("Need at least one miner")
@@ -31,17 +35,21 @@ func main() {
 	pool := miner.NewPool(*miners, *threads, *inPath, *outPath, bc)
 	pool.Prepare()
 
-	go utils.Spinner("Mining...")
+	if !constants.Benchmark {
+		go utils.Spinner("Mining...")
+	}
 
 	minedAll := pool.Process()
 
-	if !minedAll {
-		fmt.Println("\nCould not find blocks for the following transactions:")
+	if !constants.Benchmark {
+		if !minedAll {
+			fmt.Println("\nCould not find blocks for the following transactions:")
 
-		for pool.Queue.Size > 0 {
-			pool.Queue.Dequeue().Print()
+			for pool.Queue.Size > 0 {
+				pool.Queue.Dequeue().Print()
+			}
 		}
-	}
 
-	pool.Finish()
+		pool.Finish()
+	}
 }
