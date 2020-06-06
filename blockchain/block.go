@@ -8,10 +8,10 @@ import (
 )
 
 type Block struct {
-	Header        *Header        `json:"header"`
-	Transactions  []*Transaction `json:"transactions"`
-	NTransactions uint           `json:"ntransactions"`
-	Next          *Block
+	Header        *Header        `json:"header"`        // information about the block
+	Transactions  []*Transaction `json:"transactions"`  // list of transactions
+	NTransactions uint           `json:"ntransactions"` // number of transactions
+	Next          *Block         // next block in the linked list
 }
 
 func NewBlock(h *Header, transactions []*Transaction) *Block {

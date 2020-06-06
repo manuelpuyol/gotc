@@ -9,10 +9,10 @@ import (
 )
 
 type Header struct {
-	Nonce uint32
-	Prev  string
-	Root  string
-	Hash  string
+	Nonce uint32 // number used for minig
+	Prev  string // hash of the last block
+	Root  string // merkle root of the transaction list
+	Hash  string // hash of the block
 }
 
 func NewHeader(nonce uint32, prev, root string) *Header {

@@ -9,10 +9,10 @@ import (
 )
 
 type Transaction struct {
-	Value    uint32 `json:"value"`
-	Sender   string `json:"sender"`
-	Receiver string `json:"receiver"`
-	Hash     string
+	Value    uint32 `json:"value"`    // value of the transaction
+	Sender   string `json:"sender"`   // sender hash
+	Receiver string `json:"receiver"` // receiver hash
+	Hash     string // transaction hash
 }
 
 func NewTransaction(value uint32) *Transaction {

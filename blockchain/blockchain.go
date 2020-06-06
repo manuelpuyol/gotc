@@ -10,11 +10,11 @@ import (
 )
 
 type Blockchain struct {
-	Difficulty int
-	Head       *Block
-	Tail       *Block
-	NBlocks    uint
-	mutex      *sync.Mutex
+	Difficulty int         // number of trailing 0s needed
+	Head       *Block      // first block
+	Tail       *Block      // last block
+	NBlocks    uint        // how many blocks in the blockchain
+	mutex      *sync.Mutex // mutex to sync Add
 }
 
 func NewBlockchain(difficulty int) *Blockchain {
