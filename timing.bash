@@ -24,6 +24,14 @@ run_timings() {
   (time ./main -d 6 -p 4) > out.txt 2> timings/d6/parallel_4-$n.txt
   (time ./main -d 6 -p 6) > out.txt 2> timings/d6/parallel_6-$n.txt
   (time ./main -d 6 -p 8) > out.txt 2> timings/d6/parallel_8-$n.txt
+
+  echo "difficulty 7"
+  (time ./main -d 7) > out.txt 2> timings/d7/serial-$n.txt
+  (time ./main -d 7 -p 1) > out.txt 2> timings/d7/parallel_1-$n.txt
+  (time ./main -d 7 -p 2) > out.txt 2> timings/d7/parallel_2-$n.txt
+  (time ./main -d 7 -p 4) > out.txt 2> timings/d7/parallel_4-$n.txt
+  (time ./main -d 7 -p 6) > out.txt 2> timings/d7/parallel_6-$n.txt
+  (time ./main -d 7 -p 8) > out.txt 2> timings/d7/parallel_8-$n.txt
 }
 
 rm -rf timings/
@@ -31,9 +39,11 @@ mkdir timings
 mkdir timings/d4
 mkdir timings/d5
 mkdir timings/d6
+mkdir timings/d7
 
 n=1
 run_timings
 n=2
 run_timings
 n=3
+run_timings
