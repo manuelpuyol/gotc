@@ -1,5 +1,13 @@
 package miner
 
+/*
+#cgo LDFLAGS: -L${SRCDIR}/../ -lgpu
+
+#include<stdlib.h>
+u_int32_t cmine(const char *str, int difficulty);
+*/
+import "C"
+
 import (
 	"fmt"
 	"gotc/blockchain"
@@ -9,37 +17,35 @@ import (
 	"gotc/sync"
 	"strconv"
 	"sync/atomic"
+	"unsafe"
 
 	"github.com/gitchander/permutation"
 )
 
-type Miner interface {
-	Mine() bool
-	Reset(t []*blockchain.Transaction)
-}
-
-type CPUMiner struct {
+type Miner struct {
 	transactions []*blockchain.Transaction
 	bc           *blockchain.Blockchain
 	prev         string
 	found        int32
 	nonce        uint32
+	gpu          bool
 	id           int
 	barrier      *sync.Barrier
 }
 
-func NewCPUMiner(bc *blockchain.Blockchain, threads, id int) Miner {
-	return &CPUMiner{
+func NewMiner(bc *blockchain.Blockchain, threads int, gpu bool, id int) *Miner {
+	return &Miner{
 		bc:      bc,
 		prev:    bc.LastHash(),
 		found:   constants.NotFound,
 		nonce:   0,
+		gpu:     gpu,
 		id:      id,
 		barrier: sync.NewBarrier(threads),
 	}
 }
 
-func (m *CPUMiner) Reset(t []*blockchain.Transaction) {
+func (m *Miner) Reset(t []*blockchain.Transaction) {
 	m.transactions = t
 	m.prev = m.bc.LastHash()
 	m.found = constants.NotFound
@@ -48,7 +54,7 @@ func (m *CPUMiner) Reset(t []*blockchain.Transaction) {
 	m.barrier.Reset()
 }
 
-func (m *CPUMiner) Mine() bool {
+func (m *Miner) Mine() bool {
 	p := permutation.New(blockchain.Slice(m.transactions))
 
 	for m.found == constants.NotFound && p.Next() {
@@ -68,7 +74,7 @@ func (m *CPUMiner) Mine() bool {
 	return false
 }
 
-func (m *CPUMiner) sendBlock() bool {
+func (m *Miner) sendBlock() bool {
 	mt := merkle.NewTree(m.transactions)
 	h := blockchain.NewHeader(m.nonce, m.prev, mt.GetRoot())
 
@@ -84,11 +90,38 @@ func (m *CPUMiner) sendBlock() bool {
 	return res
 }
 
-func (m *CPUMiner) checkPermutation() {
+func (m *Miner) checkPermutation() {
 	mt := merkle.NewTree(m.transactions)
 	root := mt.GetRoot()
 	prefix := m.prev + root
 
+	if m.gpu {
+		m.checkGPU(prefix)
+	} else {
+		m.checkCPU(prefix)
+	}
+}
+
+func (m *Miner) checkGPU(prefix string) {
+	str := C.CString(prefix)
+	defer C.free(unsafe.Pointer(str))
+
+	difficulty := C.int(m.bc.Difficulty)
+	nonce := C.cmine(str, difficulty)
+
+	h := hash.NewHash(m.bc.Difficulty)
+
+	test := prefix + strconv.FormatUint(uint64(nonce), 10)
+
+	// parallelism is on GPU, so no need to be atomic
+	// also check if hash is correct, since GPU always returns a value
+	if h.IsValid(test) {
+		m.nonce = uint32(nonce)
+		m.found = constants.Found
+	}
+}
+
+func (m *Miner) checkCPU(prefix string) {
 	if m.barrier.Threads > 0 {
 		m.barrier.Start()
 		var id uint32
@@ -101,7 +134,7 @@ func (m *CPUMiner) checkPermutation() {
 	}
 }
 
-func findNonce(id uint32, m *CPUMiner, prefix string) {
+func findNonce(id uint32, m *Miner, prefix string) {
 	bucket := constants.MaxUint32
 
 	if m.barrier.Threads > 0 {

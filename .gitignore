@@ -1,6 +1,9 @@
 .vscode/
 .orig
 main
+gotc
 data/blockchain.json
 out.txt
 timings/
+bin/
+*.so

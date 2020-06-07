@@ -16,6 +16,7 @@ func main() {
 	miners := flag.Int("m", 1, "The number of miners to spawn")
 	threads := flag.Int("p", 0, "The number of threads for each miner to run, defaults to 0 (serial implementation).")
 	benchmark := flag.Bool("b", false, "Enable benchmark mode (disable output)")
+	gpu := flag.Bool("g", false, "Enable GPU")
 
 	flag.Parse()
 
@@ -32,7 +33,7 @@ func main() {
 	}
 
 	bc := blockchain.NewBlockchain(*difficulty)
-	pool := miner.NewPool(*miners, *threads, *inPath, *outPath, bc)
+	pool := miner.NewPool(*miners, *threads, *inPath, *outPath, *gpu, bc)
 	pool.Prepare()
 
 	if !constants.Benchmark {

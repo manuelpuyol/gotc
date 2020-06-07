@@ -33,20 +33,20 @@ type Pool struct {
 	size    int
 	inPath  string
 	outPath string
-	miners  []Miner
+	miners  []*Miner
 	bc      *blockchain.Blockchain
 	ctx     *PoolCTX
 	barrier *gsync.Barrier
 	Queue   *queue.Queue
 }
 
-func NewPool(size, threads int, inPath, outPath string, bc *blockchain.Blockchain) *Pool {
+func NewPool(size, threads int, inPath, outPath string, gpu bool, bc *blockchain.Blockchain) *Pool {
 	var cond sync.Cond
 	q := queue.NewQueue(&cond)
 
-	var miners []Miner
+	var miners []*Miner
 	for i := 0; i < size; i++ {
-		miners = append(miners, NewCPUMiner(bc, threads, i))
+		miners = append(miners, NewMiner(bc, threads, gpu, i))
 	}
 
 	return &Pool{
