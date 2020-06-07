@@ -4,7 +4,7 @@ package miner
 #cgo LDFLAGS: -L${SRCDIR}/../ -lgpu
 
 #include<stdlib.h>
-u_int32_t cmine(const char *str, int difficulty);
+u_int32_t cmine(const char *str, int difficulty, u_int32_t max);
 */
 import "C"
 
@@ -95,6 +95,10 @@ func (m *Miner) checkPermutation() {
 	root := mt.GetRoot()
 	prefix := m.prev + root
 
+	m.Check(prefix)
+}
+
+func (m *Miner) Check(prefix string) {
 	if m.gpu {
 		m.checkGPU(prefix)
 	} else {
@@ -107,7 +111,8 @@ func (m *Miner) checkGPU(prefix string) {
 	defer C.free(unsafe.Pointer(str))
 
 	difficulty := C.int(m.bc.Difficulty)
-	nonce := C.cmine(str, difficulty)
+	max := C.uint(constants.MaxUint32)
+	nonce := C.cmine(str, difficulty, max)
 
 	h := hash.NewHash(m.bc.Difficulty)
 

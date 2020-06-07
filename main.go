@@ -9,7 +9,18 @@ import (
 	"gotc/utils"
 )
 
+type Flags struct {
+	difficulty int
+	inPath     string
+	outPath    string
+	miners     int
+	threads    int
+	silent     bool
+	gpu        bool
+}
+
 func main() {
+	benchmark := flag.Bool("b", false, "Run hashing benchmark")
 	difficulty := flag.Int("d", 5, "The number of trailing 0s needed for a block to be valid")
 	inPath := flag.String("f", "data/transactions.txt", "Path to the file which contains the transactions to be read")
 	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain")
@@ -20,20 +31,38 @@ func main() {
 
 	flag.Parse()
 
-	constants.Silent = *silent
+	f := &Flags{
+		*difficulty,
+		*inPath,
+		*outPath,
+		*miners,
+		*threads,
+		*silent,
+		*gpu,
+	}
 
-	if *miners == 0 {
+	if *benchmark {
+		runBenchmark()
+	} else {
+		run(f)
+	}
+}
+
+func run(f *Flags) {
+	constants.Silent = f.silent
+
+	if f.miners == 0 {
 		fmt.Println("Need at least one miner")
 		return
 	}
 
-	if *threads == 0 && *miners > 1 {
+	if f.threads == 0 && f.miners > 1 {
 		fmt.Println("Can't run miner pool in sequential mode")
 		return
 	}
 
-	bc := blockchain.NewBlockchain(*difficulty)
-	pool := miner.NewPool(*miners, *threads, *inPath, *outPath, *gpu, bc)
+	bc := blockchain.NewBlockchain(f.difficulty)
+	pool := miner.NewPool(f.miners, f.threads, f.inPath, f.outPath, f.gpu, bc)
 	pool.Prepare()
 
 	if !constants.Silent {
@@ -53,4 +82,14 @@ func main() {
 
 		pool.Finish()
 	}
+}
+
+func runBenchmark() {
+	miner.BenchmarkSerial()
+	miner.Benchmark1Thread()
+	miner.Benchmark2Threads()
+	miner.Benchmark4Threads()
+	miner.Benchmark6Threads()
+	miner.Benchmark8Threads()
+	miner.BenchmarkGPU()
 }

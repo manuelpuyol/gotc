@@ -14,7 +14,7 @@ make
 There are some parameters too:
 
 ```
-  -b    Enable benchmark mode (disable output)
+  -b    Run hashing benchmark
   -d int
         The number of trailing 0s needed for a block to be valid (default 5)
   -f string
@@ -26,6 +26,7 @@ There are some parameters too:
         Path to output the resulting blockchain (default "data/blockchain.json")
   -p int
         The number of threads for each miner to run, defaults to 0 (serial implementation).
+  -s    Enable silent mode (disable output)
 
 ```
 
