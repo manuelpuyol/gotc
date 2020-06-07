@@ -8,8 +8,3 @@
 {"value": 8, "sender": "sender 8", "receiver": "receiver 8"}
 {"value": 9, "sender": "sender 9", "receiver": "receiver 9"}
 {"value": 10, "sender": "sender 10", "receiver": "receiver 10"}
-{"value": 11, "sender": "sender 11", "receiver": "receiver 11"}
-{"value": 12, "sender": "sender 12", "receiver": "receiver 12"}
-{"value": 13, "sender": "sender 13", "receiver": "receiver 13"}
-{"value": 14, "sender": "sender 14", "receiver": "receiver 14"}
-{"value": 15, "sender": "sender 15", "receiver": "receiver 15"}

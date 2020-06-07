@@ -10,64 +10,64 @@ run_hashrate() {
 
 run_timings() {
   echo "difficulty 4"
-  (time ./gotc -s -f data/timing.txt) > out.txt 2> benchmarks/timings/d4/serial-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4) > out.txt 2> benchmarks/timings/d4/serial-$n.txt
   echo "Running with 1 cores"
-  (time ./gotc -s -f data/timing.txt -p 1) > out.txt 2> benchmarks/timings/d4/parallel_1-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4 -p 1) > out.txt 2> benchmarks/timings/d4/parallel_1-$n.txt
   echo "Running with 4 cores"
-  (time ./gotc -s -f data/timing.txt -p 4) > out.txt 2> benchmarks/timings/d4/parallel_4-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4 -p 4) > out.txt 2> benchmarks/timings/d4/parallel_4-$n.txt
   echo "Running with 8 cores"
-  (time ./gotc -s -f data/timing.txt -p 8) > out.txt 2> benchmarks/timings/d4/parallel_8-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4 -p 8) > out.txt 2> benchmarks/timings/d4/parallel_8-$n.txt
   echo "Running with 12 cores"
-  (time ./gotc -s -f data/timing.txt -p 12) > out.txt 2> benchmarks/timings/d4/parallel_12-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4 -p 12) > out.txt 2> benchmarks/timings/d4/parallel_12-$n.txt
   echo "Running with 16 cores"
-  (time ./gotc -s -f data/timing.txt -p 16) > out.txt 2> benchmarks/timings/d4/parallel_16-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4 -p 16) > out.txt 2> benchmarks/timings/d4/parallel_16-$n.txt
   echo "Running with GPU"
-  (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d4/parallel_gpu-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 4 -g) > out.txt 2> benchmarks/timings/d4/parallel_gpu-$n.txt
 
   echo "difficulty 5"
-  (time ./gotc -s -f data/timing.txt) > out.txt 2> benchmarks/timings/d5/serial-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5) > out.txt 2> benchmarks/timings/d5/serial-$n.txt
   echo "Running with 1 cores"
-  (time ./gotc -s -f data/timing.txt -p 1) > out.txt 2> benchmarks/timings/d5/parallel_1-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5 -p 1) > out.txt 2> benchmarks/timings/d5/parallel_1-$n.txt
   echo "Running with 4 cores"
-  (time ./gotc -s -f data/timing.txt -p 4) > out.txt 2> benchmarks/timings/d5/parallel_4-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5 -p 4) > out.txt 2> benchmarks/timings/d5/parallel_4-$n.txt
   echo "Running with 8 cores"
-  (time ./gotc -s -f data/timing.txt -p 8) > out.txt 2> benchmarks/timings/d5/parallel_8-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5 -p 8) > out.txt 2> benchmarks/timings/d5/parallel_8-$n.txt
   echo "Running with 12 cores"
-  (time ./gotc -s -f data/timing.txt -p 12) > out.txt 2> benchmarks/timings/d5/parallel_12-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5 -p 12) > out.txt 2> benchmarks/timings/d5/parallel_12-$n.txt
   echo "Running with 16 cores"
-  (time ./gotc -s -f data/timing.txt -p 16) > out.txt 2> benchmarks/timings/d5/parallel_16-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5 -p 16) > out.txt 2> benchmarks/timings/d5/parallel_16-$n.txt
   echo "Running with GPU"
-  (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d5/parallel_gpu-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 5 -g) > out.txt 2> benchmarks/timings/d5/parallel_gpu-$n.txt
 
   echo "difficulty 6"
-  (time ./gotc -s -f data/timing.txt) > out.txt 2> benchmarks/timings/d6/serial-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6) > out.txt 2> benchmarks/timings/d6/serial-$n.txt
   echo "Running with 1 cores"
-  (time ./gotc -s -f data/timing.txt -p 1) > out.txt 2> benchmarks/timings/d6/parallel_1-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6 -p 1) > out.txt 2> benchmarks/timings/d6/parallel_1-$n.txt
   echo "Running with 4 cores"
-  (time ./gotc -s -f data/timing.txt -p 4) > out.txt 2> benchmarks/timings/d6/parallel_4-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6 -p 4) > out.txt 2> benchmarks/timings/d6/parallel_4-$n.txt
   echo "Running with 8 cores"
-  (time ./gotc -s -f data/timing.txt -p 8) > out.txt 2> benchmarks/timings/d6/parallel_8-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6 -p 8) > out.txt 2> benchmarks/timings/d6/parallel_8-$n.txt
   echo "Running with 12 cores"
-  (time ./gotc -s -f data/timing.txt -p 12) > out.txt 2> benchmarks/timings/d6/parallel_12-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6 -p 12) > out.txt 2> benchmarks/timings/d6/parallel_12-$n.txt
   echo "Running with 16 cores"
-  (time ./gotc -s -f data/timing.txt -p 16) > out.txt 2> benchmarks/timings/d6/parallel_16-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6 -p 16) > out.txt 2> benchmarks/timings/d6/parallel_16-$n.txt
   echo "Running with GPU"
-  (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d6/parallel_gpu-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 6 -g) > out.txt 2> benchmarks/timings/d6/parallel_gpu-$n.txt
 
   echo "difficulty 7"
-  (time ./gotc -s -f data/timing.txt) > out.txt 2> benchmarks/timings/d7/serial-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7) > out.txt 2> benchmarks/timings/d7/serial-$n.txt
   echo "Running with 1 cores"
-  (time ./gotc -s -f data/timing.txt -p 1) > out.txt 2> benchmarks/timings/d7/parallel_1-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7 -p 1) > out.txt 2> benchmarks/timings/d7/parallel_1-$n.txt
   echo "Running with 4 cores"
-  (time ./gotc -s -f data/timing.txt -p 4) > out.txt 2> benchmarks/timings/d7/parallel_4-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7 -p 4) > out.txt 2> benchmarks/timings/d7/parallel_4-$n.txt
   echo "Running with 8 cores"
-  (time ./gotc -s -f data/timing.txt -p 8) > out.txt 2> benchmarks/timings/d7/parallel_8-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7 -p 8) > out.txt 2> benchmarks/timings/d7/parallel_8-$n.txt
   echo "Running with 12 cores"
-  (time ./gotc -s -f data/timing.txt -p 12) > out.txt 2> benchmarks/timings/d7/parallel_12-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7 -p 12) > out.txt 2> benchmarks/timings/d7/parallel_12-$n.txt
   echo "Running with 16 cores"
-  (time ./gotc -s -f data/timing.txt -p 16) > out.txt 2> benchmarks/timings/d7/parallel_16-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7 -p 16) > out.txt 2> benchmarks/timings/d7/parallel_16-$n.txt
   echo "Running with GPU"
-  (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d7/parallel_gpu-$n.txt
+  (time ./gotc -s -f data/timing.txt -d 7 -g) > out.txt 2> benchmarks/timings/d7/parallel_gpu-$n.txt
 }
 
 make
