@@ -44,18 +44,18 @@ func benchmarkMiner(threads int, gpu bool) {
 	}
 }
 
-func benchmarkSerial()   { benchmarkMiner(0, false) }
-func benchmark2Threads() { benchmarkMiner(2, false) }
-func benchmark4Threads() { benchmarkMiner(4, false) }
-func benchmark6Threads() { benchmarkMiner(6, false) }
-func benchmark8Threads() { benchmarkMiner(8, false) }
-func benchmarkGPU()      { benchmarkMiner(0, true) }
+func benchmarkSerial()    { benchmarkMiner(0, false) }
+func benchmark4Threads()  { benchmarkMiner(4, false) }
+func benchmark8Threads()  { benchmarkMiner(8, false) }
+func benchmark12Threads() { benchmarkMiner(12, false) }
+func benchmark16Threads() { benchmarkMiner(16, false) }
+func benchmarkGPU()       { benchmarkMiner(0, true) }
 
 func BenchmarkAll() {
 	benchmarkSerial()
-	benchmark2Threads()
 	benchmark4Threads()
-	benchmark6Threads()
 	benchmark8Threads()
+	benchmark12Threads()
+	benchmark16Threads()
 	benchmarkGPU()
 }
