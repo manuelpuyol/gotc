@@ -42,7 +42,7 @@ func main() {
 	}
 
 	if *benchmark {
-		runBenchmark()
+		runBenchmark(*gpu)
 	} else {
 		run(f)
 	}
@@ -84,6 +84,6 @@ func run(f *Flags) {
 	}
 }
 
-func runBenchmark() {
-	miner.BenchmarkAll()
+func runBenchmark(gpu bool) {
+	miner.BenchmarkAll(gpu)
 }

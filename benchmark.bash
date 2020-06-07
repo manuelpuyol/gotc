@@ -21,8 +21,6 @@ run_timings() {
   (time ./gotc -s -f data/benchmark4.txt -d 4 -p 12) > out.txt 2> benchmarks/timings/d4/parallel_12-$n.txt
   echo "Running with 16 cores"
   (time ./gotc -s -f data/benchmark4.txt -d 4 -p 16) > out.txt 2> benchmarks/timings/d4/parallel_16-$n.txt
-  echo "Running with GPU"
-  (time ./gotc -s -f data/benchmark4.txt -d 4 -g) > out.txt 2> benchmarks/timings/d4/parallel_gpu-$n.txt
 
   echo "difficulty 5"
   (time ./gotc -s -f data/benchmark3.txt -d 5) > out.txt 2> benchmarks/timings/d5/serial-$n.txt
@@ -36,8 +34,6 @@ run_timings() {
   (time ./gotc -s -f data/benchmark3.txt -d 5 -p 12) > out.txt 2> benchmarks/timings/d5/parallel_12-$n.txt
   echo "Running with 16 cores"
   (time ./gotc -s -f data/benchmark3.txt -d 5 -p 16) > out.txt 2> benchmarks/timings/d5/parallel_16-$n.txt
-  echo "Running with GPU"
-  (time ./gotc -s -f data/benchmark3.txt -d 5 -g) > out.txt 2> benchmarks/timings/d5/parallel_gpu-$n.txt
 
   echo "difficulty 6"
   (time ./gotc -s -f data/benchmark2.txt -d 6) > out.txt 2> benchmarks/timings/d6/serial-$n.txt
@@ -51,8 +47,6 @@ run_timings() {
   (time ./gotc -s -f data/benchmark2.txt -d 6 -p 12) > out.txt 2> benchmarks/timings/d6/parallel_12-$n.txt
   echo "Running with 16 cores"
   (time ./gotc -s -f data/benchmark2.txt -d 6 -p 16) > out.txt 2> benchmarks/timings/d6/parallel_16-$n.txt
-  echo "Running with GPU"
-  (time ./gotc -s -f data/benchmark2.txt -d 6 -g) > out.txt 2> benchmarks/timings/d6/parallel_gpu-$n.txt
 
   echo "difficulty 7"
   (time ./gotc -s -f data/benchmark1.txt -d 7) > out.txt 2> benchmarks/timings/d7/serial-$n.txt
@@ -66,8 +60,6 @@ run_timings() {
   (time ./gotc -s -f data/benchmark1.txt -d 7 -p 12) > out.txt 2> benchmarks/timings/d7/parallel_12-$n.txt
   echo "Running with 16 cores"
   (time ./gotc -s -f data/benchmark1.txt -d 7 -p 16) > out.txt 2> benchmarks/timings/d7/parallel_16-$n.txt
-  echo "Running with GPU"
-  (time ./gotc -s -f data/benchmark1.txt -d 7 -g) > out.txt 2> benchmarks/timings/d7/parallel_gpu-$n.txt
 }
 
 make

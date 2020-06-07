@@ -51,11 +51,14 @@ func benchmark12Threads() { benchmarkMiner(12, false) }
 func benchmark16Threads() { benchmarkMiner(16, false) }
 func benchmarkGPU()       { benchmarkMiner(0, true) }
 
-func BenchmarkAll() {
-	benchmarkSerial()
-	benchmark4Threads()
-	benchmark8Threads()
-	benchmark12Threads()
-	benchmark16Threads()
-	benchmarkGPU()
+func BenchmarkAll(gpu bool) {
+	if gpu {
+		benchmarkGPU()
+	} else {
+		benchmarkSerial()
+		benchmark4Threads()
+		benchmark8Threads()
+		benchmark12Threads()
+		benchmark16Threads()
+	}
 }
