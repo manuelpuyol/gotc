@@ -35,14 +35,27 @@ func benchmarkMiner(threads int, gpu bool) {
 	end := time.Now()
 	seconds := end.Sub(start).Seconds()
 
-	fmt.Println("Took", seconds, "seconds")
-	fmt.Println(constants.MaxUint32/uint32(seconds), "Hashes per second")
+	if gpu {
+		fmt.Println("GPU -", constants.MaxUint32/uint32(seconds), "Hashes per second")
+	} else if threads == 0 {
+		fmt.Println("Serial -", constants.MaxUint32/uint32(seconds), "Hashes per second")
+	} else {
+		fmt.Println(threads, "Threads -", constants.MaxUint32/uint32(seconds), "Hashes per second")
+	}
 }
 
-func BenchmarkSerial()   { benchmarkMiner(0, false) }
-func Benchmark1Thread()  { benchmarkMiner(1, false) }
-func Benchmark2Threads() { benchmarkMiner(2, false) }
-func Benchmark4Threads() { benchmarkMiner(4, false) }
-func Benchmark6Threads() { benchmarkMiner(6, false) }
-func Benchmark8Threads() { benchmarkMiner(8, false) }
-func BenchmarkGPU()      { benchmarkMiner(0, true) }
+func benchmarkSerial()   { benchmarkMiner(0, false) }
+func benchmark2Threads() { benchmarkMiner(2, false) }
+func benchmark4Threads() { benchmarkMiner(4, false) }
+func benchmark6Threads() { benchmarkMiner(6, false) }
+func benchmark8Threads() { benchmarkMiner(8, false) }
+func benchmarkGPU()      { benchmarkMiner(0, true) }
+
+func BenchmarkAll() {
+	benchmarkSerial()
+	benchmark2Threads()
+	benchmark4Threads()
+	benchmark6Threads()
+	benchmark8Threads()
+	benchmarkGPU()
+}

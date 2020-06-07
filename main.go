@@ -85,11 +85,5 @@ func run(f *Flags) {
 }
 
 func runBenchmark() {
-	miner.BenchmarkSerial()
-	miner.Benchmark1Thread()
-	miner.Benchmark2Threads()
-	miner.Benchmark4Threads()
-	miner.Benchmark6Threads()
-	miner.Benchmark8Threads()
-	miner.BenchmarkGPU()
+	miner.BenchmarkAll()
 }
