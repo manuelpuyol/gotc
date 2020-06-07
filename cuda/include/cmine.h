@@ -3,8 +3,8 @@
 
 #define NOT_FOUND -1
 #define FOUND 1
-#define BLOCKS 512
-#define THREADS 512
+#define BLOCKS 1024
+#define THREADS 32
 #define TOTAL BLOCKS * THREADS
 
 extern "C" {

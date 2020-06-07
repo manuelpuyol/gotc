@@ -24,11 +24,11 @@ run_timings() {
 
 make
 
-n=1
-run_timings
-n=2
-run_timings
-n=3
-run_timings
+# n=1
+# run_timings
+# n=2
+# run_timings
+# n=3
+# run_timings
 
 run_hashrate
