@@ -54,26 +54,27 @@ run_timings() {
   echo "Running with GPU"
   (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d6/parallel_gpu-$n.txt
 
-  # echo "difficulty 7"
-  # (time ./gotc -s -f data/timing.txt) > out.txt 2> benchmarks/timings/d7/serial-$n.txt
-  # echo "Running with 1 cores"
-  # (time ./gotc -s -f data/timing.txt -p 1) > out.txt 2> benchmarks/timings/d7/parallel_1-$n.txt
-  # echo "Running with 4 cores"
-  # (time ./gotc -s -f data/timing.txt -p 4) > out.txt 2> benchmarks/timings/d7/parallel_4-$n.txt
-  # echo "Running with 8 cores"
-  # (time ./gotc -s -f data/timing.txt -p 8) > out.txt 2> benchmarks/timings/d7/parallel_8-$n.txt
-  # echo "Running with 12 cores"
-  # (time ./gotc -s -f data/timing.txt -p 12) > out.txt 2> benchmarks/timings/d7/parallel_12-$n.txt
-  # echo "Running with 16 cores"
-  # (time ./gotc -s -f data/timing.txt -p 16) > out.txt 2> benchmarks/timings/d7/parallel_16-$n.txt
-  # echo "Running with GPU"
-  # (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d7/parallel_gpu-$n.txt
+  echo "difficulty 7"
+  (time ./gotc -s -f data/timing.txt) > out.txt 2> benchmarks/timings/d7/serial-$n.txt
+  echo "Running with 1 cores"
+  (time ./gotc -s -f data/timing.txt -p 1) > out.txt 2> benchmarks/timings/d7/parallel_1-$n.txt
+  echo "Running with 4 cores"
+  (time ./gotc -s -f data/timing.txt -p 4) > out.txt 2> benchmarks/timings/d7/parallel_4-$n.txt
+  echo "Running with 8 cores"
+  (time ./gotc -s -f data/timing.txt -p 8) > out.txt 2> benchmarks/timings/d7/parallel_8-$n.txt
+  echo "Running with 12 cores"
+  (time ./gotc -s -f data/timing.txt -p 12) > out.txt 2> benchmarks/timings/d7/parallel_12-$n.txt
+  echo "Running with 16 cores"
+  (time ./gotc -s -f data/timing.txt -p 16) > out.txt 2> benchmarks/timings/d7/parallel_16-$n.txt
+  echo "Running with GPU"
+  (time ./gotc -s -f data/timing.txt -g) > out.txt 2> benchmarks/timings/d7/parallel_gpu-$n.txt
 }
 
 make
 
 rm -rf benchmarks/
 mkdir benchmarks
+mkdir benchmarks/hashrate/
 mkdir benchmarks/timings/
 mkdir benchmarks/timings/d4
 mkdir benchmarks/timings/d5
