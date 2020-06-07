@@ -35,12 +35,14 @@ func benchmarkMiner(threads int, gpu bool) {
 	end := time.Now()
 	seconds := end.Sub(start).Seconds()
 
+	hashrate := int(float64(constants.MaxUint32) / seconds)
+
 	if gpu {
-		fmt.Println("GPU -", float64(constants.MaxUint32)/seconds, "Hashes per second")
+		fmt.Println("GPU -", hashrate, "Hashes per second")
 	} else if threads == 0 {
-		fmt.Println("Serial -", float64(constants.MaxUint32)/seconds, "Hashes per second")
+		fmt.Println("Serial -", hashrate, "Hashes per second")
 	} else {
-		fmt.Println(threads, "Threads -", float64(constants.MaxUint32)/seconds, "Hashes per second")
+		fmt.Println(threads, "Threads -", hashrate, "Hashes per second")
 	}
 }
 
