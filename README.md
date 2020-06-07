@@ -16,7 +16,7 @@ There are some parameters too:
 ```
   -b    Run hashing benchmark
   -d int
-        The number of trailing 0s needed for a block to be valid (default 5)
+        The number of leading 0s needed for a block to be valid (default 5)
   -f string
         Path to the file which contains the transactions to be read (default "data/transactions.txt")
   -g    Enable GPU
@@ -51,7 +51,7 @@ Mining is the core process of this project. Here is thow this is implemented:
 4. Miner divides the maximum Uint32 value into nthreads blocks
 5. Miner spawns threads
 6. Thread runs in a loop hashing values with a nonce in their allocated block
-7. If a hash has the number of trailing 0s necessary, Miner is notified and threads stop their executions
+7. If a hash has the number of leading 0s necessary, Miner is notified and threads stop their executions
 8. If not, go to step 2
 9. If block is found, add it to the blockchain
 10. If add failed, try to mine again with new blockchain value
@@ -69,7 +69,7 @@ Since this is a blockchain, we can only add to the end of the chain, so we have 
 
 ```go
 type Blockchain struct {
-	Difficulty int         // number of trailing 0s needed
+	Difficulty int         // number of leading 0s needed
 	Head       *Block      // first block
 	Tail       *Block      // last block
 	NBlocks    uint        // how many blocks in the blockchain

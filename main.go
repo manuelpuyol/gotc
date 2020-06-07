@@ -21,7 +21,7 @@ type Flags struct {
 
 func main() {
 	benchmark := flag.Bool("b", false, "Run hashing benchmark")
-	difficulty := flag.Int("d", 5, "The number of trailing 0s needed for a block to be valid")
+	difficulty := flag.Int("d", 5, "The number of leading 0s needed for a block to be valid")
 	inPath := flag.String("f", "data/transactions.txt", "Path to the file which contains the transactions to be read")
 	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain")
 	miners := flag.Int("m", 1, "The number of miners to spawn")

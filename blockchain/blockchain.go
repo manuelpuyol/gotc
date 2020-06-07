@@ -10,7 +10,7 @@ import (
 )
 
 type Blockchain struct {
-	Difficulty int         // number of trailing 0s needed
+	Difficulty int         // number of leading 0s needed
 	Head       *Block      // first block
 	Tail       *Block      // last block
 	NBlocks    uint        // how many blocks in the blockchain
