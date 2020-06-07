@@ -36,11 +36,11 @@ func benchmarkMiner(threads int, gpu bool) {
 	seconds := end.Sub(start).Seconds()
 
 	if gpu {
-		fmt.Println("GPU -", constants.MaxUint32/uint32(seconds), "Hashes per second")
+		fmt.Println("GPU -", float64(constants.MaxUint32)/seconds, "Hashes per second")
 	} else if threads == 0 {
-		fmt.Println("Serial -", constants.MaxUint32/uint32(seconds), "Hashes per second")
+		fmt.Println("Serial -", float64(constants.MaxUint32)/seconds, "Hashes per second")
 	} else {
-		fmt.Println(threads, "Threads -", constants.MaxUint32/uint32(seconds), "Hashes per second")
+		fmt.Println(threads, "Threads -", float64(constants.MaxUint32)/seconds, "Hashes per second")
 	}
 }
 
@@ -48,7 +48,6 @@ func benchmarkSerial()    { benchmarkMiner(0, false) }
 func benchmark4Threads()  { benchmarkMiner(4, false) }
 func benchmark8Threads()  { benchmarkMiner(8, false) }
 func benchmark12Threads() { benchmarkMiner(12, false) }
-func benchmark16Threads() { benchmarkMiner(16, false) }
 func benchmarkGPU()       { benchmarkMiner(0, true) }
 
 func BenchmarkAll(gpu bool) {
@@ -59,6 +58,5 @@ func BenchmarkAll(gpu bool) {
 		benchmark4Threads()
 		benchmark8Threads()
 		benchmark12Threads()
-		benchmark16Threads()
 	}
 }
