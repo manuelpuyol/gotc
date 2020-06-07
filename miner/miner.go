@@ -80,7 +80,7 @@ func (m *Miner) sendBlock() bool {
 
 	res := m.bc.AddBlock(blockchain.NewBlock(h, m.transactions))
 
-	if res && !constants.Benchmark {
+	if res && !constants.Silent {
 		fmt.Println("\nMiner", m.id, "found a block")
 		fmt.Println("Nonce = ", m.nonce)
 		fmt.Println("Hash = ", h.Hash)

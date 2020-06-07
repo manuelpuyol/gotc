@@ -15,12 +15,12 @@ func main() {
 	outPath := flag.String("o", "data/blockchain.json", "Path to output the resulting blockchain")
 	miners := flag.Int("m", 1, "The number of miners to spawn")
 	threads := flag.Int("p", 0, "The number of threads for each miner to run, defaults to 0 (serial implementation).")
-	benchmark := flag.Bool("b", false, "Enable benchmark mode (disable output)")
+	silent := flag.Bool("s", false, "Enable silent mode (disable output)")
 	gpu := flag.Bool("g", false, "Enable GPU")
 
 	flag.Parse()
 
-	constants.Benchmark = *benchmark
+	constants.Silent = *silent
 
 	if *miners == 0 {
 		fmt.Println("Need at least one miner")
@@ -36,13 +36,13 @@ func main() {
 	pool := miner.NewPool(*miners, *threads, *inPath, *outPath, *gpu, bc)
 	pool.Prepare()
 
-	if !constants.Benchmark {
+	if !constants.Silent {
 		go utils.Spinner("Mining...")
 	}
 
 	minedAll := pool.Process()
 
-	if !constants.Benchmark {
+	if !constants.Silent {
 		if !minedAll {
 			fmt.Println("\nCould not find blocks for the following transactions:")
 
