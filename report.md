@@ -13,10 +13,11 @@ Mining blocks is a very well known problem which uses lots of computational proc
 
 First, please make sure to read the  `README` to have a general idea of the project and mining algorithm.
 
-There are two main parallel components:
+There are three main parallel components:
 
 1. MiningPool
 2. Miner
+3. GPU
 
 ### MiningPool
 
@@ -38,6 +39,11 @@ Each routine will test hashes while changing the nonce inside its chunk, until a
 Again, we have a barrier here which waits for all routines to end before returning or trying the next permutation.
 
 Since multiple miners are in play and someone may have already found a block, the miner verifies if its block could be added to the blockchain, if not (which means another block was inserted before it could finish), it will start the process again with updated parameters.
+
+### GPU
+
+To improve performance, I developed a GPU version of the mining algorithm. When using this option, the Miner will call the GPU code and the GPU will return a nonce.
+The process is basically the same as the goroutines, the GPU will check all possibles nonces for a permutation and let the miner permute/add the block to the blockchain.
 
 ## Challenges
 

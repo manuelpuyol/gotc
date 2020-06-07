@@ -7,27 +7,32 @@ A **simplified** blockchain implementation, inspired in BTC
 This project has a single main file and you can run it using
 
 ```
-go run main.go
+make
+./gotc
 ```
 
 There are some parameters too:
 
 ```
--d int
-      The number of trailing 0s needed for a block to be valid (default 5)
--f string
-      Path to the file which contains the transactions to be read (default "data/transactions.txt")
--m int
-      The number of miners to spawn (default 1)
--o string
-      Path to output the resulting blockchain (default "data/blockchain.json")
--p int
-      The number of threads for each miner to run, defaults to 0 (serial implementation).
+  -b    Enable benchmark mode (disable output)
+  -d int
+        The number of trailing 0s needed for a block to be valid (default 5)
+  -f string
+        Path to the file which contains the transactions to be read (default "data/transactions.txt")
+  -g    Enable GPU
+  -m int
+        The number of miners to spawn (default 1)
+  -o string
+        Path to output the resulting blockchain (default "data/blockchain.json")
+  -p int
+        The number of threads for each miner to run, defaults to 0 (serial implementation).
+
 ```
 
 ## Dependencies
 
 [Permutation package](https://github.com/gitchander/permutation) - to deal with the Transactions permutations on my miner.
+[CUDA SHA256](https://github.com/Horkyze/CudaSHA256) - based my SHA256 implementation on this code
 
 ## How it works
 
