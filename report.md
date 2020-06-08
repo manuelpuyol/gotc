@@ -105,3 +105,9 @@ This produced the following graph:
 ![Hashrate speedup](images/hashrate.png)
 
 As expected, when we increase the number of threads, the hashrate also increases (almost linearly). This is a great indicator for the miner, because it means it will test more nonces. This is useful with blockchains with a bigger difficulty.
+
+### GPU
+
+For my GPU implementation, the hashrate was around 1048576 hashes/second, which represents a ~3.25 speedup comparing to the serial implementation. This was **not** the expected result. I expected the GPU to have largely overperformed any CPU implementation.
+
+Unfortunately, at the time of testing, I did not have access to a physical NVIDIA GPU and the node provided by the university does not have the tools necessary to profile my program.
